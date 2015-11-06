@@ -3,7 +3,6 @@ ADD_PARAM?=
 all: test
 
 bake:
-	hg clone http://code.nsnam.org/bake
 
 check_pkgs:
 	@./bake/bake.py check | grep Bazaar | grep OK || (echo "bzr is missing" && ./bake/bake.py check)
@@ -18,7 +17,7 @@ testbin: bake check_pkgs
 	cd buildtop ; \
 	../bake/bake.py download ; \
 	../bake/bake.py update ; \
-	../bake/bake.py build 
+	../bake/bake.py build -vvv
 
 test:
 	@./test.sh ADD_PARAM=$(ADD_PARAM)
