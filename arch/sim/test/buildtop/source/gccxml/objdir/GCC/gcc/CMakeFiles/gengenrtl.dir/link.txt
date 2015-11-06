@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/gengenrtl.dir/gengenrtl.c.o CMakeFiles/gengenrtl.dir/errors.c.o  -o gengenrtl -rdynamic libiberty.a 

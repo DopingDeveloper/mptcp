@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genpreds.dir/genpreds.c.o  -o genpreds -rdynamic libgen.a libiberty.a 

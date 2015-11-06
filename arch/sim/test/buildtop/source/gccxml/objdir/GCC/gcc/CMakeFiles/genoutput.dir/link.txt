@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genoutput.dir/genoutput.c.o  -o genoutput -rdynamic libgen.a libiberty.a 

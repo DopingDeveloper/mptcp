@@ -1,0 +1,2 @@
+/usr/bin/ar cr libgen.a  CMakeFiles/gen.dir/rtl.c.o CMakeFiles/gen.dir/read-rtl.c.o CMakeFiles/gen.dir/ggc-none.c.o CMakeFiles/gen.dir/vec.c.o CMakeFiles/gen.dir/gensupport.c.o CMakeFiles/gen.dir/print-rtl.c.o CMakeFiles/gen.dir/errors.c.o CMakeFiles/gen.dir/min-insn-modes.c.o
+/usr/bin/ranlib libgen.a

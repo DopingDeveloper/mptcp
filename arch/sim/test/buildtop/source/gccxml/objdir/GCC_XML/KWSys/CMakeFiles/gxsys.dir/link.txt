@@ -1,0 +1,2 @@
+/usr/bin/ar cr libgxsys.a  CMakeFiles/gxsys.dir/ProcessUNIX.c.o CMakeFiles/gxsys.dir/System.c.o CMakeFiles/gxsys.dir/Directory.cxx.o CMakeFiles/gxsys.dir/RegularExpression.cxx.o CMakeFiles/gxsys.dir/SystemTools.cxx.o
+/usr/bin/ranlib libgxsys.a

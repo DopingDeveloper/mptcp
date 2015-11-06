@@ -1,0 +1,183 @@
+# project ns (3.20) configured on Tue Sep  1 11:21:24 2015 by
+# waf 1.7.13 (abi 98, python 20703f0 on linux2)
+# using ./waf configure
+#
+----------------------------------------
+Setting top to
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/ns-3.20
+----------------------------------------
+Setting out to
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/ns-3.20/build
+----------------------------------------
+Checking for 'gcc' (c compiler)
+find program=['gcc', 'cc'] paths=['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'] var='CC' -> '/usr/bin/gcc'
+find program=['ar'] paths=['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'] var='AR' -> '/usr/bin/ar'
+/usr/bin/gcc
+----------------------------------------
+Checking for cc version
+4.6.3
+----------------------------------------
+Checking for 'g++' (c++ compiler)
+find program=['g++', 'c++'] paths=['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'] var='CXX' -> '/usr/bin/g++'
+(tool ar is already loaded, skipping)
+/usr/bin/g++
+---------------------------------------------------------
+Checking for compilation flag -Wl,--soname=foo... support
+==>
+#include <stdio.h>
+int main() { return 0; }
+
+<==
+[1/2] [32mcxx: build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/test.cc -> build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/test.cc.1.o
+[0m
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-Wl,--soname=foo', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cc', '-c', '-o', 'test.cc.1.o']
+[2/2] [33mcxxprogram: build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/test.cc.1.o -> build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/testprog
+[0m
+['/usr/bin/g++', 'test.cc.1.o', '-o', '/home/dkoe/mptcp/arch/sim/test/buildtop/source/ns-3.20/build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/testprog', '-Wl,-Bstatic', '-Wl,-Bdynamic']
+ok
+---------------------------------------------------------
+Checking for program python
+/usr/bin/python
+find program=['python'] paths=['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'] var='PYTHON' -> '/usr/bin/python'
+['/usr/bin/python', '-c', 'import sys\nfor x in sys.version_info: print(str(x))']
+out: 2
+7
+3
+final
+0
+
+['/usr/bin/python', '-c', "from distutils.sysconfig import get_config_var, get_python_lib\n\nprint(repr(get_python_lib(standard_lib=0, prefix='/usr/local') or ''))"]
+out: '/usr/local/lib/python2.7/dist-packages'
+
+'/usr/local/lib/python2.7/dist-packages'
+
+['/usr/bin/python', '-c', "from distutils.sysconfig import get_config_var, get_python_lib\n\nprint(repr(get_python_lib(plat_specific=1, standard_lib=0, prefix='/usr/local') or ''))"]
+out: '/usr/local/lib/python2.7/dist-packages'
+
+'/usr/local/lib/python2.7/dist-packages'
+
+---------------------------------------------------------
+Checking for python version
+(2, 7, 3, 'final', 0)
+['/usr/bin/python', '-c', "from distutils.sysconfig import get_config_var, get_python_lib\n\nprint(repr(get_config_var('prefix') or ''))\nprint(repr(get_config_var('SO') or ''))\nprint(repr(get_config_var('LDFLAGS') or ''))\nprint(repr(get_config_var('LIBDIR') or ''))\nprint(repr(get_config_var('LIBPL') or ''))\nprint(repr(get_config_var('INCLUDEPY') or ''))\nprint(repr(get_config_var('Py_ENABLE_SHARED') or ''))\nprint(repr(get_config_var('MACOSX_DEPLOYMENT_TARGET') or ''))\nprint(repr(get_config_var('LDSHARED') or ''))\nprint(repr(get_config_var('CFLAGS') or ''))"]
+out: '/usr'
+'.so'
+'-Wl,-Bsymbolic-functions -Wl,-z,relro'
+'/usr/lib'
+'/usr/lib/python2.7/config'
+'/usr/include/python2.7'
+''
+''
+'gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro'
+'-fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security'
+
+'/usr'
+'.so'
+'-Wl,-Bsymbolic-functions -Wl,-z,relro'
+'/usr/lib'
+'/usr/lib/python2.7/config'
+'/usr/include/python2.7'
+''
+''
+'gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro'
+'-fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security'
+
+Configuration returned from ['/usr/bin/python']:
+"prefix = '/usr'\nSO = '.so'\nLDFLAGS = '-Wl,-Bsymbolic-functions -Wl,-z,relro'\nLIBDIR = '/usr/lib'\nLIBPL = '/usr/lib/python2.7/config'\nINCLUDEPY = '/usr/include/python2.7'\nPy_ENABLE_SHARED = ''\nMACOSX_DEPLOYMENT_TARGET = ''\nLDSHARED = 'gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro'\nCFLAGS = '-fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security'"
+
+
+
+# try again with -L$python_LIBDIR: ['/usr/lib']
+
+---------------------------------------------------------
+Checking for library python2.7 in LIBDIR
+==>
+
+int main(int argc, char **argv) {
+	(void)argc; (void)argv;
+	return 0;
+}
+
+<==
+[1/2] [32mcxx: build/.conf_check_3b2479b91ea1f8aedc2bbc867fa4858e/test.cpp -> build/.conf_check_3b2479b91ea1f8aedc2bbc867fa4858e/testbuild/test.cpp.1.o
+[0m
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-fno-strict-aliasing', '-fwrapv', '-fstack-protector', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DPYTHONDIR="/usr/local/lib/python2.7/dist-packages"', '-DPYTHONARCHDIR="/usr/local/lib/python2.7/dist-packages"', '-DNDEBUG', '../test.cpp', '-c', '-o', 'test.cpp.1.o']
+[2/2] [33mcxxprogram: build/.conf_check_3b2479b91ea1f8aedc2bbc867fa4858e/testbuild/test.cpp.1.o -> build/.conf_check_3b2479b91ea1f8aedc2bbc867fa4858e/testbuild/testprog
+[0m
+['/usr/bin/g++', '-Wl,-Bsymbolic-functions', '-Wl,-z,relro', 'test.cpp.1.o', '-o', '/home/dkoe/mptcp/arch/sim/test/buildtop/source/ns-3.20/build/.conf_check_3b2479b91ea1f8aedc2bbc867fa4858e/testbuild/testprog', '-Wl,-Bstatic', '-Wl,-Bdynamic', '-L/usr/lib', '-lpython2.7']
+yes
+------------------------------------------------------------------------------------------------
+Checking for program /usr/bin/python-config,python2.7-config,python-config-2.7,python2.7m-config
+/usr/bin/python-config
+find program=['/usr/bin/python-config', 'python2.7-config', 'python-config-2.7', 'python2.7m-config'] paths=['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'] var='PYTHON_CONFIG' -> '/usr/bin/python-config'
+['/usr/bin/python-config', '--includes']
+out: -I/usr/include/python2.7 -I/usr/include/python2.7
+
+Include path for Python extensions (found via python-config --includes): ['/usr/include/python2.7']
+
+------------------------------------------------------------------------------------------------
+Checking for header Python.h
+==>
+
+#include <Python.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+	void Py_Initialize(void);
+	void Py_Finalize(void);
+#ifdef __cplusplus
+}
+#endif
+int main(int argc, char **argv)
+{
+   (void)argc; (void)argv;
+   Py_Initialize();
+   Py_Finalize();
+   return 0;
+}
+
+<==
+[1/2] [32mcxx: build/.conf_check_1f933b02106127ce3a9f4633a0e368e7/test.cpp -> build/.conf_check_1f933b02106127ce3a9f4633a0e368e7/testbuild/test.cpp.1.o
+[0m
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-fno-strict-aliasing', '-fwrapv', '-fstack-protector', '-fno-strict-aliasing', '-I/usr/include/python2.7', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DPYTHONDIR="/usr/local/lib/python2.7/dist-packages"', '-DPYTHONARCHDIR="/usr/local/lib/python2.7/dist-packages"', '-DNDEBUG', '../test.cpp', '-c', '-o', 'test.cpp.1.o']
+[2/2] [33mcxxprogram: build/.conf_check_1f933b02106127ce3a9f4633a0e368e7/testbuild/test.cpp.1.o -> build/.conf_check_1f933b02106127ce3a9f4633a0e368e7/testbuild/testprog
+[0m
+['/usr/bin/g++', '-Wl,-Bsymbolic-functions', '-Wl,-z,relro', 'test.cpp.1.o', '-o', '/home/dkoe/mptcp/arch/sim/test/buildtop/source/ns-3.20/build/.conf_check_1f933b02106127ce3a9f4633a0e368e7/testbuild/testprog', '-Wl,-Bstatic', '-Wl,-Bdynamic', '-L/usr/lib', '-lpython2.7']
+yes
+------------------------------------------------------------------------------------------------
+Checking for compilation flag -fvisibility=hidden... support
+==>
+#include <stdio.h>
+int main() { return 0; }
+
+<==
+[1/2] [32mcxx: build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/test.cc -> build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/test.cc.1.o
+[0m
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-fvisibility=hidden', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DPYTHONDIR="/usr/local/lib/python2.7/dist-packages"', '-DPYTHONARCHDIR="/usr/local/lib/python2.7/dist-packages"', '-DHAVE_PYTHON_H=1', '../test.cc', '-c', '-o', 'test.cc.1.o']
+[2/2] [33mcxxprogram: build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/test.cc.1.o -> build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/testprog
+[0m
+['/usr/bin/g++', 'test.cc.1.o', '-o', '/home/dkoe/mptcp/arch/sim/test/buildtop/source/ns-3.20/build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/testprog', '-Wl,-Bstatic', '-Wl,-Bdynamic']
+ok
+------------------------------------------------------------------------------------------------
+Checking for compilation flag -Wno-array-bounds... support
+==>
+#include <stdio.h>
+int main() { return 0; }
+
+<==
+[1/2] [32mcxx: build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/test.cc -> build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/test.cc.1.o
+[0m
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-Wno-array-bounds', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DPYTHONDIR="/usr/local/lib/python2.7/dist-packages"', '-DPYTHONARCHDIR="/usr/local/lib/python2.7/dist-packages"', '-DHAVE_PYTHON_H=1', '../test.cc', '-c', '-o', 'test.cc.1.o']
+[2/2] [33mcxxprogram: build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/test.cc.1.o -> build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/testprog
+[0m
+['/usr/bin/g++', 'test.cc.1.o', '-o', '/home/dkoe/mptcp/arch/sim/test/buildtop/source/ns-3.20/build/.conf_check_fe0ca542f39064c5a14ee41a2e983996/testbuild/testprog', '-Wl,-Bstatic', '-Wl,-Bdynamic']
+ok
+------------------------------------------------------------------------------------------------
+Checking for pybindgen location
+../pybindgen (guessed)
+------------------------------------------------------------------------------------------------
+Python module pybindgen
+['/usr/bin/python', '-c', "\nimport pybindgen as current_module\nversion = getattr(current_module, '__version__', None)\nif version is not None:\n    print(str(version))\nelse:\n    print('unknown version')\n"]
+out: 0.17.0.post41+ngd10fa60
+
+0.17.0.post41+ngd10fa60

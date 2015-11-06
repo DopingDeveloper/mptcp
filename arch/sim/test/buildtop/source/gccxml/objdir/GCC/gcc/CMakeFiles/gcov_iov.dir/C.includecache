@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^([^ri]|i[^n]|in[^s]|ins[^n]|insn[^-]|r[^t]|rt[^l]|rtl[^.])
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/gcc/gcov-iov.c
+stdio.h
+-
+stdlib.h
+-
+

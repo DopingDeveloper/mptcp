@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/gengtype.dir/gengtype.c.o CMakeFiles/gengtype.dir/gengtype-lex.c.o CMakeFiles/gengtype.dir/gengtype-yacc.c.o CMakeFiles/gengtype.dir/errors.c.o  -o gengtype -rdynamic libiberty.a 

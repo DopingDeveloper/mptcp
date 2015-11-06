@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../gcc/libdecnumber.a  CMakeFiles/decnumber.dir/decNumber.c.o CMakeFiles/decnumber.dir/decContext.c.o CMakeFiles/decnumber.dir/decUtility.c.o CMakeFiles/decnumber.dir/decimal32.c.o CMakeFiles/decnumber.dir/decimal64.c.o CMakeFiles/decnumber.dir/decimal128.c.o
+/usr/bin/ranlib ../gcc/libdecnumber.a

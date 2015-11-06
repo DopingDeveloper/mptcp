@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genpeep.dir/genpeep.c.o  -o genpeep -rdynamic libgen.a libiberty.a 

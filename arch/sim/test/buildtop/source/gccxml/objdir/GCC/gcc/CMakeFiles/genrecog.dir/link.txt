@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genrecog.dir/genrecog.c.o  -o genrecog -rdynamic libgen.a libiberty.a 

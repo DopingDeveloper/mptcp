@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genextract.dir/genextract.c.o  -o genextract -rdynamic libgen.a libiberty.a 

@@ -1,0 +1,600 @@
+Determining if the system is big endian passed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/TestEndianess.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w      CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o  -o cmTryCompileExec -rdynamic 
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+
+TestEndianess.c:
+/* A 16 bit integer is required. */
+typedef unsigned short cmakeint16;
+
+/* On a little endian machine, these 16bit ints will give "THIS IS LITTLE ENDIAN."
+   On a big endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_little[] =  {0x4854, 0x5349, 0x4920, 0x2053, 0x494c, 0x5454, 0x454c, 0x4520, 0x444e, 0x4149, 0x2e4e, 0x0000};
+
+/* on a big endian machine, these 16bit ints will give "THIS IS BIG ENDIAN."
+   On a little endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_big[] =     {0x5448, 0x4953, 0x2049, 0x5320, 0x4249, 0x4720, 0x454e, 0x4449, 0x414e, 0x2e2e, 0x0000};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_little[argc];
+  require += info_big[argc];
+  (void)argv;
+  return require;
+}
+
+
+Determining if the include file machine/hal_sysinfo.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:33: fatal error: machine/hal_sysinfo.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file sys/pstat.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:23: fatal error: sys/pstat.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file sys/sysmp.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:23: fatal error: sys/sysmp.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file sys/systemcfg.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:27: fatal error: sys/systemcfg.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file sys/table.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:23: fatal error: sys/table.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file vfork.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:19: fatal error: vfork.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the function _doprnt exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=_doprnt   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=_doprnt    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `_doprnt'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the function getsysinfo exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=getsysinfo   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=getsysinfo    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `getsysinfo'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function pstat_getdynamic exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=pstat_getdynamic   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=pstat_getdynamic    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `pstat_getdynamic'
+collect2: ld returned 1 exit status
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the function pstat_getstatic exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=pstat_getstatic   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=pstat_getstatic    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `pstat_getstatic'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the function sysmp exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=sysmp   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=sysmp    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `sysmp'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the function table exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=table   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=table    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `table'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+checking for sys_errlist in stdlib.h failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/bin/gcc  -DTEST_HAVE_SYS_ERRLIST_IN_STDLIB_H -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c: In function ‘main’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c:668:10: error: ‘sys_errlist’ undeclared (first use in this function)
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c:668:10: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+checking for variable _doprnt failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/bin/gcc  -DTEST_HAVE__DOPRNT -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w      CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o: In function `main':
+gcc_c_tests.c:(.text+0x6): undefined reference to `_doprnt'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+checking for variable _system_configuration failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/bin/gcc  -DTEST_HAVE__SYSTEM_CONFIGURATION -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w      CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o: In function `main':
+gcc_c_tests.c:(.text+0x6): undefined reference to `_system_configuration'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+checking whether canonicalize_file_name must be declared failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/bin/gcc  -DTEST_NEED_DECLARATION_CANONICALIZE_FILE_NAME -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c: In function ‘main’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c:311:28: error: ‘canonicalize_file_name’ undeclared (first use in this function)
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c:311:28: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+checking whether alloca needs Cray hooks failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/bin/gcc  -DTEST_CRAY_STACKSEG_END -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c: In function ‘main’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c:473:3: error: ‘not_cray’ undeclared (first use in this function)
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/config_cmake/gcc_c_tests.c:473:3: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file direct.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:20: fatal error: direct.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file ldfcn.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:19: fatal error: ldfcn.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the function atoq exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=atoq   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=atoq    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `atoq'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the function fprintf_unlocked exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=fprintf_unlocked   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=fprintf_unlocked    CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x15): undefined reference to `fprintf_unlocked'
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+collect2: ld returned 1 exit status
+make[2]: *** [cmTryCompileExec] 오류 1
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Check for fprintf_unlocked failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/bin/gcc   -w     -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/gcc" -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c: In function ‘main’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: error: ‘fprintf_unlocked’ undeclared (first use in this function)
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Check for getopt failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/bin/gcc   -w     -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/gcc" -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c: In function ‘main’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: error: ‘getopt’ undeclared (first use in this function)
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Check for ldgetname failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/bin/gcc   -w     -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/gcc" -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c: In function ‘main’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: error: ‘ldgetname’ undeclared (first use in this function)
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Check for times failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/bin/gcc   -w     -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/gcc" -I"/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c: In function ‘main’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: error: ‘times’ undeclared (first use in this function)
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_check_decl.c:10:25: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Checking for non-standard argument to stl allocator<>::max_size failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/kwsysPlatformTestsCXX.cxx.o
+/usr/bin/c++   -DTEST_KWSYS_STL_HAS_ALLOCATOR_MAX_SIZE_ARGUMENT -DKWSYS_STL_HAVE_STD=1  -o CMakeFiles/cmTryCompileExec.dir/kwsysPlatformTestsCXX.cxx.o -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx: In function ‘void f(const std::allocator<char>&)’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx:247:25: error: no matching function for call to ‘std::allocator<char>::max_size(long unsigned int) const’
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx:247:25: note: candidate is:
+/usr/include/c++/4.6/ext/new_allocator.h:101:7: note: __gnu_cxx::new_allocator<_Tp>::size_type __gnu_cxx::new_allocator<_Tp>::max_size() const [with _Tp = char, __gnu_cxx::new_allocator<_Tp>::size_type = long unsigned int]
+/usr/include/c++/4.6/ext/new_allocator.h:101:7: note:   candidate expects 0 arguments, 1 provided
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/kwsysPlatformTestsCXX.cxx.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Checking whether "<>" is needed for template friends failed to compile with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/kwsysPlatformTestsCXX.cxx.o
+/usr/bin/c++   -DTEST_KWSYS_CXX_HAS_NULL_TEMPLATE_ARGS  -o CMakeFiles/cmTryCompileExec.dir/kwsysPlatformTestsCXX.cxx.o -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx:132:21: warning: friend declaration ‘int f(A<T>&)’ declares a non-template function [-Wnon-template-friend]
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx:132:21: note: (if this is not what you intended, make sure the function template has already been declared and add <> after the function name here) 
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx: In function ‘int f(A<T>&) [with T = int]’:
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx:138:23:   instantiated from here
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx:134:7: error: ‘int A<int>::x’ is private
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/GCC_XML/KWSys/kwsysPlatformTestsCXX.cxx:137:50: error: within this context
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/kwsysPlatformTestsCXX.cxx.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC_XML/KWSys/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+
+Determining if the include file machine/hal_sysinfo.h exists failed with the following output:
+Change Dir: /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec/fast"
+make[1]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[2]: Entering directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:33: fatal error: machine/hal_sysinfo.h: 그런 파일이나 디렉터리가 없습니다
+compilation terminated.
+make[2]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[2]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] 오류 1
+make[1]: Leaving directory `/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec/fast] 오류 2
+
+

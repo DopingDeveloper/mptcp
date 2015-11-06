@@ -1,0 +1,27 @@
+NS3 {
+global:
+	libdl_setup;
+};
+GLIBC_2.2.5 {
+global:
+	dlclose;
+	dlsym;
+	dladdr;
+	dlopen;
+	dlerror;
+	dlvsym;
+local:*;
+};
+GLIBC_2.3.3 {
+global:
+	dlinfo;
+	dladdr1;
+} GLIBC_2.2.5;
+GLIBC_2.3.4 {
+global:
+	dlmopen;
+} GLIBC_2.3.3;
+GLIBC_PRIVATE {
+global:
+	_dlfcn_hook;
+} GLIBC_2.3.4;

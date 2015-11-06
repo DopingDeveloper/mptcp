@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genflags.dir/genflags.c.o  -o genflags -rdynamic libgen.a libiberty.a 

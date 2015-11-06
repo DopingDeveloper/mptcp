@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/gccxml.dir/gxSystemTools.cxx.o CMakeFiles/gccxml.dir/gxConfiguration.cxx.o CMakeFiles/gccxml.dir/gxDocumentation.cxx.o CMakeFiles/gccxml.dir/gxFlagsParser.cxx.o CMakeFiles/gccxml.dir/gxFront.cxx.o  -o ../../bin/gccxml -rdynamic ../KWSys/libgxsys.a 

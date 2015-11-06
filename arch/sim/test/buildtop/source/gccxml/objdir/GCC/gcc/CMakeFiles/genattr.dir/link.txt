@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genattr.dir/genattr.c.o  -o genattr -rdynamic libgen.a libiberty.a 

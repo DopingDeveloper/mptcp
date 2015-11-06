@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genconditions.dir/genconditions.c.o  -o genconditions -rdynamic libgen.a libiberty.a 

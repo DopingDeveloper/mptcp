@@ -1,0 +1,2 @@
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_asm_tests/CMakeFiles/test_weak.dir
+/home/dkoe/mptcp/arch/sim/test/buildtop/source/gccxml/objdir/GCC/config_cmake/gcc_asm_tests/CMakeFiles/test_weakref.dir

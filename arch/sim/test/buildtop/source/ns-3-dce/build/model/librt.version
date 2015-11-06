@@ -1,0 +1,60 @@
+NS3 {
+global:
+	librt_setup;
+};
+GLIBC_2.2.5 {
+global:
+	aio_suspend;
+	clock_getres;
+	aio_fsync64;
+	aio_init;
+	aio_error;
+	aio_read64;
+	shm_unlink;
+	clock_settime;
+	aio_fsync;
+	aio_return64;
+	aio_return;
+	aio_error64;
+	aio_write64;
+	aio_read;
+	aio_suspend64;
+	aio_cancel;
+	shm_open;
+	aio_cancel64;
+	clock_getcpuclockid;
+	aio_write;
+	clock_nanosleep;
+	clock_gettime;
+local:*;
+};
+GLIBC_2.3.3 {
+global:
+	timer_settime;
+	timer_getoverrun;
+	timer_gettime;
+	timer_create;
+	timer_delete;
+} GLIBC_2.2.5;
+GLIBC_2.3.4 {
+global:
+	mq_timedreceive;
+	mq_timedsend;
+	mq_setattr;
+	mq_send;
+	mq_unlink;
+	mq_notify;
+	mq_open;
+	mq_receive;
+	mq_close;
+	mq_getattr;
+} GLIBC_2.3.3;
+GLIBC_2.4 {
+global:
+	lio_listio;
+	lio_listio64;
+} GLIBC_2.3.4;
+GLIBC_2.7 {
+global:
+	__mq_open_2;
+} GLIBC_2.4;

@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genmodes.dir/genmodes.c.o CMakeFiles/genmodes.dir/errors.c.o  -o genmodes -rdynamic libiberty.a 

@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genemit.dir/genemit.c.o  -o genemit -rdynamic libgen.a libiberty.a 

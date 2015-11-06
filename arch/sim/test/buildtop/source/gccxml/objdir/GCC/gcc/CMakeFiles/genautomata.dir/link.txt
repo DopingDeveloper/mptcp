@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genautomata.dir/genautomata.c.o  -o genautomata -rdynamic libgen.a -lm libiberty.a 

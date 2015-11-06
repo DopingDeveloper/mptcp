@@ -1,0 +1,11 @@
+
+prefix=/root/mptcp/arch/sim/test/buildtop/build
+libdir=/root/mptcp/arch/sim/test/buildtop/build/lib
+includedir=/root/mptcp/arch/sim/test/buildtop/build/include
+
+Name: libns3-dce
+Description: ns-3 module dce
+Version: devel
+Libs: -L${libdir} -Wl,-Bdynamic -lns3-dce -L/home/dkoe/mptcp/arch/sim/test/buildtop/build/lib -pthread -Wl,-Bdynamic -lns3-dev-core-debug -lrt -lgsl -lgslcblas -lm -L/home/dkoe/mptcp/arch/sim/test/buildtop/build/lib -pthread -Wl,-Bdynamic -lns3-dev-network-debug -lns3-dev-stats-debug -lsqlite3 -lns3-dev-core-debug -lrt -lgsl -lgslcblas -lm -L/home/dkoe/mptcp/arch/sim/test/buildtop/build/lib -pthread -Wl,-Bdynamic -lns3-dev-internet-debug -lns3-dev-bridge-debug -lns3-dev-mpi-debug -lns3-dev-network-debug -lns3-dev-stats-debug -lsqlite3 -lns3-dev-core-debug -lrt -lgsl -lgslcblas -lm
+Cflags: -I${includedir} -pthread -pthread -DHAVE_GSL=1 -I/home/dkoe/mptcp/arch/sim/test/buildtop/build/include/ns3-dev -pthread -pthread -DHAVE_GSL=1 -DHAVE_SQLITE3=1 -I/home/dkoe/mptcp/arch/sim/test/buildtop/build/include/ns3-dev -pthread -pthread -DHAVE_GSL=1 -DHAVE_SQLITE3=1 -I/home/dkoe/mptcp/arch/sim/test/buildtop/build/include/ns3-dev
+

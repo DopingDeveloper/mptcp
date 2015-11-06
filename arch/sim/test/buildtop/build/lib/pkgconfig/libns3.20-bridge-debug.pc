@@ -1,0 +1,10 @@
+prefix=/home/dkoe/mptcp_v0.88/arch/sim/test/buildtop/build
+libdir=/home/dkoe/mptcp_v0.88/arch/sim/test/buildtop/build/lib
+includedir=/home/dkoe/mptcp_v0.88/arch/sim/test/buildtop/build/include/ns3.20
+
+Name: libns3-bridge
+Description: ns-3 module ns3-bridge
+Version: 3.20
+Libs: -L${libdir} -Wl,-Bdynamic -lns3.20-bridge-debug
+Cflags: -I${includedir}
+Requires: libns3.20-network-debug

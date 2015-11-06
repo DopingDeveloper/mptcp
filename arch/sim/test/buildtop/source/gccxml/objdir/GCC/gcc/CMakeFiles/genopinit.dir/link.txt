@@ -1,0 +1,1 @@
+/usr/bin/gcc    -w    CMakeFiles/genopinit.dir/genopinit.c.o  -o genopinit -rdynamic libgen.a libiberty.a 
