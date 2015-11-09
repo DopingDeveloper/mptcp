@@ -19,7 +19,7 @@ void setPos (Ptr<Node> n, int x, int y, int z)
 
 int main (int argc, char *argv[])
 {
-  uint32_t nRtrs = 6;
+  uint32_t nRtrs = 8;
   CommandLine cmd;
   cmd.AddValue ("nRtrs", "Number of routers. Default 2", nRtrs);
   cmd.Parse (argc, argv);
@@ -69,19 +69,19 @@ int main (int argc, char *argv[])
       cmd_oss.str ("");
       cmd_oss << "rule add from " << if1.GetAddress (0, 0) << " table " << (i/2+1);
       LinuxStackHelper::RunIp (nodes.Get (0), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Node 0 : " << cmd_oss.str().c_str() << endl;
+//      cout << "Node 0 : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.1." << i/2 << ".0/24 dev sim" << i/2 << " scope link table " << (i/2+1);
       LinuxStackHelper::RunIp (nodes.Get (0), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Node 0 : " << cmd_oss.str().c_str() << endl;
+//     cout << "Node 0 : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add default via " << if1.GetAddress (1, 0) << " dev sim" << i/2 << " table " << (i/2+1);
       LinuxStackHelper::RunIp (nodes.Get (0), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Node 0 : " << cmd_oss.str().c_str() << endl;
+//      cout << "Node 0 : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.1." << i/2 << ".0/24 via " << if1.GetAddress (1, 0) << " dev sim0";
       LinuxStackHelper::RunIp (routers.Get (i), Seconds (0.2), cmd_oss.str ().c_str ());
-      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
 
       // Right link
       pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("100Mbps"));
@@ -94,19 +94,19 @@ int main (int argc, char *argv[])
       cmd_oss.str ("");
       cmd_oss << "rule add from " << if2.GetAddress (0, 0) << " table " << (i/2+1);
       LinuxStackHelper::RunIp (nodes.Get (1), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Node 1 : " << cmd_oss.str().c_str() << endl;
+//      cout << "Node 1 : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.2." << i/2 << ".0/24 dev sim" << i/2 << " scope link table " << (i/2+1);
       LinuxStackHelper::RunIp (nodes.Get (1), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Node 1 : " << cmd_oss.str().c_str() << endl;
+//      cout << "Node 1 : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add default via " << if2.GetAddress (1, 0) << " dev sim" << i/2 << " table " << (i/2+1);
       LinuxStackHelper::RunIp (nodes.Get (1), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Node 1 : " << cmd_oss.str().c_str() << endl;
+//      cout << "Node 1 : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.2." <<i/2 << ".0/24 via " << if2.GetAddress (1, 0) << " dev sim0";
       LinuxStackHelper::RunIp (routers.Get (i+1), Seconds (0.2), cmd_oss.str ().c_str ());
-      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
 
       // Center link
       pointToPoint.SetDeviceAttribute ("DataRate", StringValue("1Gbps"));
@@ -119,11 +119,11 @@ int main (int argc, char *argv[])
       cmd_oss.str("");
       cmd_oss << "route add 10.2." << i/2 << ".0/24 via " << if3.GetAddress(1, 0) << " dev sim1";
       LinuxStackHelper::RunIp (routers.Get(i), Seconds (0.3), cmd_oss.str ().c_str ());
-      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str("");
       cmd_oss << "route add 10.1." << i/2 << ".0/24 via " << if3.GetAddress(0, 0) << " dev sim1";
       LinuxStackHelper::RunIp (routers.Get(i+1), Seconds (0.3), cmd_oss.str ().c_str ());
-      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
 
       //Interfering Sender
       pointToPoint.SetDeviceAttribute ("DataRate", StringValue("100Mbps"));
@@ -149,6 +149,11 @@ int main (int argc, char *argv[])
       cmd_oss << "route add 10.4." <<i/2 << ".0/24 via " << if4.GetAddress (1, 0) << " dev sim2";
       LinuxStackHelper::RunIp (routers.Get (i), Seconds (0.2), cmd_oss.str ().c_str ());
       cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
+      cmd_oss.str ("");
+      cmd_oss << "route add 10.5." <<i/2 << ".0/24 via " << if3.GetAddress (1, 0) << " dev sim1";
+      LinuxStackHelper::RunIp (routers.Get (i), Seconds (0.2), cmd_oss.str ().c_str ());
+      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
+
 
       //Interfering Receiver
       pointToPoint.SetDeviceAttribute ("DataRate", StringValue("100Mbps"));
@@ -175,24 +180,28 @@ int main (int argc, char *argv[])
       cmd_oss << "route add 10.5." <<i/2 << ".0/24 via " << if5.GetAddress (1, 0) << " dev sim2";
       LinuxStackHelper::RunIp (routers.Get (i+1), Seconds (0.2), cmd_oss.str ().c_str ());
       cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+      cmd_oss.str ("");
+      cmd_oss << "route add 10.4." <<i/2 << ".0/24 via " << if3.GetAddress (0, 0) << " dev sim1";
+      LinuxStackHelper::RunIp (routers.Get (i+1), Seconds (0.2), cmd_oss.str ().c_str ());
+      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
 
       setPos (routers.Get (i),   25, i * 20, 0);
       setPos (routers.Get (i+1), 75, i * 20, 0);
-      setPos (interfers.Get (i), 35, (i+0.5) * 25, 0);
-      setPos (interfers.Get (i+1), 65, (i+0.5) * 25, 0);
+      setPos (interfers.Get (i), 35, (i+0.5) * 20, 0);
+      setPos (interfers.Get (i+1), 65, (i+0.5) * 20, 0);
     }
 
   // default route
   LinuxStackHelper::RunIp (nodes.Get (0), Seconds (0.1), "route add default via 10.1.0.2 dev sim0");
   LinuxStackHelper::RunIp (nodes.Get (1), Seconds (0.1), "route add default via 10.2.0.2 dev sim0");
-  LinuxStackHelper::RunIp (interfers.Get (0), Seconds (0.1), "route add default via 10.4.0.2 dev sim0");
-  LinuxStackHelper::RunIp (interfers.Get (1), Seconds (0.1), "route add default via 10.5.0.2 dev sim0");
+//  LinuxStackHelper::RunIp (interfers.Get (0), Seconds (0.1), "route add default via 10.4.0.2 dev sim0");
+//  LinuxStackHelper::RunIp (interfers.Get (1), Seconds (0.1), "route add default via 10.5.0.2 dev sim0");
   LinuxStackHelper::RunIp (nodes.Get (0), Seconds (0.1), "rule show");
 
   // Schedule Up/Down (XXX: didn't work...)
-//  LinuxStackHelper::RunIp (nodes.Get (1), Seconds (1.0), "link set dev sim0 multipath off");
-//  LinuxStackHelper::RunIp (nodes.Get (1), Seconds (15.0), "link set dev sim0 multipath on");
-//  LinuxStackHelper::RunIp (nodes.Get (1), Seconds (30.0), "link set dev sim0 multipath off");
+  LinuxStackHelper::RunIp (nodes.Get (1), Seconds (1.0), "link set dev sim0 multipath off");
+  LinuxStackHelper::RunIp (nodes.Get (1), Seconds (15.0), "link set dev sim0 multipath on");
+  LinuxStackHelper::RunIp (nodes.Get (1), Seconds (30.0), "link set dev sim0 multipath off");
 
 
   // debug
@@ -230,6 +239,33 @@ int main (int argc, char *argv[])
   pointToPoint.EnablePcapAll ("iperf-mptcp", false);
 
   apps.Start (Seconds (4));
+
+  std::ostringstream udp_address;
+  for (uint32_t i = 0; i < nRtrs; i+=2)
+    {
+      dce.SetBinary("udp-perf");
+      dce.ResetArguments();
+      dce.AddArgument("--duration=10");
+      dce.AddArgument("--nodes=4");
+      apps = dce.Install(interfers.Get(i+1));
+      apps.Start (Seconds (4.0));
+
+      dce.SetBinary("udp-perf");
+      dce.ResetArguments();
+      udp_address.str("");
+      dce.AddArgument("--client");
+      dce.AddArgument("--nodes=4");
+      udp_address << "--host=10.5." << i/2 << ".1";
+      dce.AddArgument(udp_address.str().c_str());
+      dce.AddArgument("--duration=10");
+      apps = dce.Install(interfers.Get(i));
+      apps.Start (Seconds (4.5));
+
+
+    }
+
+
+
 
   setPos (nodes.Get (0), 0, 20 * (nRtrs - 1) / 2, 0);
   setPos (nodes.Get (1), 100, 20 * (nRtrs - 1) / 2, 0);
