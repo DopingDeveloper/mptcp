@@ -136,23 +136,23 @@ int main (int argc, char *argv[])
       cmd_oss.str ("");
       cmd_oss << "rule add from " << if4.GetAddress (0, 0);
       LinuxStackHelper::RunIp (interfers.Get (i), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Interfers " << i << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Interfers " << i << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.4." << i/2 << ".0/24 dev sim0 scope link";
       LinuxStackHelper::RunIp (interfers.Get (i), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Interfers " << i << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Interfers " << i << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.5."<< i/2 <<".0/24 via " << if4.GetAddress (1, 0) << " dev sim0";
       LinuxStackHelper::RunIp (interfers.Get (i), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Interfers " << i << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Interfers " << i << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.4." <<i/2 << ".0/24 via " << if4.GetAddress (1, 0) << " dev sim2";
       LinuxStackHelper::RunIp (routers.Get (i), Seconds (0.2), cmd_oss.str ().c_str ());
-      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.5." <<i/2 << ".0/24 via " << if3.GetAddress (1, 0) << " dev sim1";
       LinuxStackHelper::RunIp (routers.Get (i), Seconds (0.2), cmd_oss.str ().c_str ());
-      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i << " : " << cmd_oss.str().c_str() << endl;
 
 
       //Interfering Receiver
@@ -163,27 +163,26 @@ int main (int argc, char *argv[])
       Ipv4InterfaceContainer if5 = address5.Assign (devices5);
       address5.NewNetwork ();
       // setup ip routes
-
       cmd_oss.str ("");
       cmd_oss << "rule add from " << if5.GetAddress (0, 0);
       LinuxStackHelper::RunIp (interfers.Get (i+1), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Interfers " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Interfers " << i+1 << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.5." << i/2 << ".0/24 dev sim0 scope link";
       LinuxStackHelper::RunIp (interfers.Get (i+1), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Interfers " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Interfers " << i+1 << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.4."<< i/2 <<".0/24 via " << if5.GetAddress (1, 0) << " dev sim0";
       LinuxStackHelper::RunIp (interfers.Get (i+1), Seconds (0.1), cmd_oss.str ().c_str ());
-      cout << "Interfers " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Interfers " << i+1 << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.5." <<i/2 << ".0/24 via " << if5.GetAddress (1, 0) << " dev sim2";
       LinuxStackHelper::RunIp (routers.Get (i+1), Seconds (0.2), cmd_oss.str ().c_str ());
-      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
       cmd_oss.str ("");
       cmd_oss << "route add 10.4." <<i/2 << ".0/24 via " << if3.GetAddress (0, 0) << " dev sim1";
       LinuxStackHelper::RunIp (routers.Get (i+1), Seconds (0.2), cmd_oss.str ().c_str ());
-      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
+//      cout << "Router " << i+1 << " : " << cmd_oss.str().c_str() << endl;
 
       setPos (routers.Get (i),   25, i * 20, 0);
       setPos (routers.Get (i+1), 75, i * 20, 0);
@@ -194,8 +193,6 @@ int main (int argc, char *argv[])
   // default route
   LinuxStackHelper::RunIp (nodes.Get (0), Seconds (0.1), "route add default via 10.1.0.2 dev sim0");
   LinuxStackHelper::RunIp (nodes.Get (1), Seconds (0.1), "route add default via 10.2.0.2 dev sim0");
-//  LinuxStackHelper::RunIp (interfers.Get (0), Seconds (0.1), "route add default via 10.4.0.2 dev sim0");
-//  LinuxStackHelper::RunIp (interfers.Get (1), Seconds (0.1), "route add default via 10.5.0.2 dev sim0");
   LinuxStackHelper::RunIp (nodes.Get (0), Seconds (0.1), "rule show");
 
   // Schedule Up/Down (XXX: didn't work...)
@@ -206,7 +203,8 @@ int main (int argc, char *argv[])
 
   // debug
   stack.SysctlSet (nodes, ".net.mptcp.mptcp_debug", "1");
-
+  stack.SysctlSet (nodes.Get(0), ".net.mptcp.mptcp_path_manager", "fullmesh");
+  stack.SysctlSet (nodes.Get(1), ".net.mptcp.mptcp_path_manager", "fullmesh");
   DceApplicationHelper dce;
   ApplicationContainer apps;
 
@@ -224,7 +222,7 @@ int main (int argc, char *argv[])
   dce.AddArgument ("50");
 
   apps = dce.Install (nodes.Get (0));
-  apps.Start (Seconds (5.0));
+  apps.Start (Seconds (2.0));
   apps.Stop (Seconds (50));
 
   // Launch iperf server on node 1
@@ -238,34 +236,25 @@ int main (int argc, char *argv[])
 
   pointToPoint.EnablePcapAll ("iperf-mptcp", false);
 
-  apps.Start (Seconds (4));
+  apps.Start (Seconds (2));
 
   std::ostringstream udp_address;
   for (uint32_t i = 0; i < nRtrs; i+=2)
     {
       dce.SetBinary("udp-perf");
       dce.ResetArguments();
-      dce.AddArgument("--duration=10");
-      dce.AddArgument("--nodes=4");
       apps = dce.Install(interfers.Get(i+1));
-      apps.Start (Seconds (4.0));
+      apps.Start (Seconds (2.0));
 
       dce.SetBinary("udp-perf");
       dce.ResetArguments();
       udp_address.str("");
       dce.AddArgument("--client");
-      dce.AddArgument("--nodes=4");
       udp_address << "--host=10.5." << i/2 << ".1";
       dce.AddArgument(udp_address.str().c_str());
-      dce.AddArgument("--duration=10");
       apps = dce.Install(interfers.Get(i));
-      apps.Start (Seconds (4.5));
-
-
+      apps.Start (Seconds (2));
     }
-
-
-
 
   setPos (nodes.Get (0), 0, 20 * (nRtrs - 1) / 2, 0);
   setPos (nodes.Get (1), 100, 20 * (nRtrs - 1) / 2, 0);
