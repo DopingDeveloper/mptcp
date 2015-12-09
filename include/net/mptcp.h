@@ -207,6 +207,17 @@ struct mptcp_tcp_sock {
 
 	/* HMAC of the third ack */
 	char sender_mac[20];
+
+	/* Scheduling ratio */
+	u64	schedule_ratio;
+	/* Data sequence number of last acknowledgement */
+	u64	last_data_ack;
+	/* Data sequence number of last retransmittion */
+	u64	retx_seq;
+	/* Number of bytes in the meta-socket allocated to this subflow */
+	u64	alloc_byte;
+	/* Number of unacked bytes in the meta-socket allocated to this subflow */
+	u64	unacked_byte;
 };
 
 struct mptcp_tw {
@@ -325,6 +336,12 @@ struct mptcp_cb {
 	int orig_sk_rcvbuf;
 	int orig_sk_sndbuf;
 	u32 orig_window_clamp;
+
+	// added by kaewon
+	u64 last_print_out; //previous time (in ms) of printing out variables
+	u64 init_print_out; //initial printing time
+	u64 init_snd_una; //initial send_una
+	int data_ack_needed; //set if data ack should be sent
 };
 
 #define MPTCP_SUB_CAPABLE			0
@@ -628,6 +645,12 @@ extern int sysctl_mptcp_enabled;
 extern int sysctl_mptcp_checksum;
 extern int sysctl_mptcp_debug;
 extern int sysctl_mptcp_syn_retries;
+extern int sysctl_mptcp_scheduler;
+extern int sysctl_mptcp_retx;
+extern int sysctl_mptcp_print_log;
+extern int sysctl_mptcp_sndwnd;
+extern int sysctl_mptcp_cwnd[8];
+extern int sysctl_mptcp_schedule_ratio[8];
 
 extern struct workqueue_struct *mptcp_wq;
 
@@ -706,6 +729,8 @@ void mptcp_send_fin(struct sock *meta_sk);
 void mptcp_send_active_reset(struct sock *meta_sk, gfp_t priority);
 int mptcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
 		     int push_one, gfp_t gfp);
+int mptcp_send_pkt(struct sock *meta_sk, struct sock *subsk, struct sk_buff *skb, int state, unsigned int mss_now, int nonagle,
+		     int push_one, gfp_t gfp);
 void mptcp_parse_options(const uint8_t *ptr, int opsize,
 			 struct tcp_options_received *opt_rx,
 			 struct mptcp_options_received *mopt,
@@ -773,6 +798,7 @@ bool mptcp_should_expand_sndbuf(struct sock *meta_sk);
 int mptcp_retransmit_skb(struct sock *meta_sk, struct sk_buff *skb);
 void mptcp_tsq_flags(struct sock *sk);
 void mptcp_tsq_sub_deferred(struct sock *meta_sk);
+void mptcp_update_scheduling_ratio(struct sock *sk); //added by kaewon
 struct mp_join *mptcp_find_join(struct sk_buff *skb);
 void mptcp_hash_remove_bh(struct tcp_sock *meta_tp);
 void mptcp_hash_remove(struct tcp_sock *meta_tp);
@@ -1147,6 +1173,8 @@ static inline void mptcp_sub_close_passive(struct sock *sk)
 static inline bool mptcp_fallback_infinite(struct sock *sk, int flag)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
+
+	return false; // added by kaewon (for preventing fallback when data ack is removed from some packets)
 
 	/* If data has been acknowleged on the meta-level, fully_established
 	 * will have been set before and thus we will not fall back to infinite

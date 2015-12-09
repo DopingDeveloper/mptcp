@@ -36,6 +36,19 @@
 #include <net/mptcp_v6.h>
 #include <net/sock.h>
 
+//needed by mptcp_select_segment (modified by kaewon)
+/* is seq1 < seq2 ? */
+static inline int before64(const u64 seq1, const u64 seq2)
+{
+	return (s64)(seq1 - seq2) < 0;
+}
+
+/* is seq1 > seq2 ? */
+static inline int after64(const u64 seq1, const u64 seq2)
+{
+	return (s64)(seq1 - seq2) > 0;
+}
+
 static inline int mptcp_pi_to_flag(int pi)
 {
 	return 1 << (pi - 1);
@@ -522,6 +535,143 @@ static void mptcp_combine_dfin(struct sk_buff *skb, struct sock *meta_sk,
 	}
 }
 
+//modified by kaewon
+static struct sk_buff *mptcp_skb_entail_modified(struct sock *sk, struct sk_buff *skb,
+					int reinject)
+{
+	__be32 *ptr;
+	__u16 data_len;
+	struct mp_dss *mdss;
+	struct tcp_sock *tp = tcp_sk(sk);
+	struct sock *meta_sk = mptcp_meta_sk(sk);
+	struct sock *sk_it;
+	struct mptcp_cb *mpcb = tp->mpcb;
+	struct tcp_skb_cb *tcb;
+	struct sk_buff *subskb = NULL;
+
+	if (!reinject)
+		TCP_SKB_CB(skb)->mptcp_flags |= (mpcb->snd_hiseq_index ?
+						  MPTCPHDR_SEQ64_INDEX : 0);
+
+	subskb = mptcp_pskb_copy(skb);
+	if (!subskb)
+		return NULL;
+
+	// Do not mark at path_mask if it is retransmission (modified by kaewon) 
+	// Add to alloc_byte and unacked_byte (modified by kaewon)
+	if (!reinject) {
+		u32 size = TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb)->seq;
+		TCP_SKB_CB(skb)->path_mask |= mptcp_pi_to_flag(tp->mptcp->path_index);
+		tp->mptcp->alloc_byte += size;
+		tp->mptcp->unacked_byte += size;
+	} else {
+		TCP_SKB_CB(skb)->retx_mask |= mptcp_pi_to_flag(tp->mptcp->path_index);
+	}
+
+	//printk("[inject] %lu %lu\n", jiffies, TCP_SKB_CB(skb)->path_mask);
+
+	if (!(sk->sk_route_caps & NETIF_F_ALL_CSUM) &&
+	    skb->ip_summed == CHECKSUM_PARTIAL) {
+		subskb->csum = skb->csum = skb_checksum(skb, 0, skb->len, 0);
+		subskb->ip_summed = skb->ip_summed = CHECKSUM_NONE;
+	}
+
+	/* The subskb is going in the subflow send-queue. Its path-mask
+	 * is not needed anymore and MUST be set to 0, as the path-mask
+	 * is a union with inet_skb_param.
+	 */
+	tcb = TCP_SKB_CB(subskb);
+	tcb->path_mask = 0;
+	// retransmission mask is set to the original skb
+	tcb->retx_mask = TCP_SKB_CB(skb)->retx_mask;
+
+	// Set data sequence number to data_seq_no before it is gone (modified by kaewon)
+	tcb->data_seq_no = tcb->seq;
+
+	if (mptcp_is_data_fin(subskb))
+		mptcp_combine_dfin(subskb, meta_sk, sk);
+
+	if (tp->mpcb->infinite_mapping_snd)
+		goto no_data_seq;
+
+	if (tp->mpcb->send_infinite_mapping &&
+	    !before(tcb->seq, mptcp_meta_tp(tp)->snd_nxt)) {
+		tp->mptcp->fully_established = 1;
+		tp->mpcb->infinite_mapping_snd = 1;
+		tp->mptcp->infinite_cutoff_seq = tp->write_seq;
+		tcb->mptcp_flags |= MPTCPHDR_INF;
+		data_len = 0;
+	} else {
+		data_len = tcb->end_seq - tcb->seq;
+	}
+
+	/**** Write MPTCP DSS-option to the packet. ****/
+	ptr = (__be32 *)(subskb->data - (MPTCP_SUB_LEN_DSS_ALIGN +
+				      MPTCP_SUB_LEN_ACK_ALIGN +
+				      MPTCP_SUB_LEN_SEQ_ALIGN));
+
+	/* Then we start writing it from the start */
+	mdss = (struct mp_dss *)ptr;
+
+	mdss->kind = TCPOPT_MPTCP;
+	mdss->sub = MPTCP_SUB_DSS;
+	mdss->rsv1 = 0;
+	mdss->rsv2 = 0;
+	mdss->F = (mptcp_is_data_fin(subskb) ? 1 : 0);
+	mdss->m = 0;
+	mdss->M = 1;
+	mdss->a = 0;
+	mdss->A = 1;
+	mdss->len = mptcp_sub_len_dss(mdss, tp->mpcb->dss_csum);
+
+	ptr++;
+	ptr++; /* data_ack will be set in mptcp_options_write */
+	*ptr++ = htonl(tcb->seq); /* data_seq */
+
+	/* If it's a non-data DATA_FIN, we set subseq to 0 (draft v7) */
+	if (mptcp_is_data_fin(subskb) && subskb->len == 0)
+		*ptr++ = 0; /* subseq */
+	else
+		*ptr++ = htonl(tp->write_seq - tp->mptcp->snt_isn); /* subseq */
+
+	if (tp->mpcb->dss_csum && data_len) {
+		__be16 *p16 = (__be16 *)ptr;
+		__be32 hdseq = mptcp_get_highorder_sndbits(subskb, tp->mpcb);
+		__wsum csum;
+		*ptr = htonl(((data_len) << 16) |
+				(TCPOPT_EOL << 8) |
+				(TCPOPT_EOL));
+
+		csum = csum_partial(ptr - 2, 12, subskb->csum);
+		p16++;
+		*p16++ = csum_fold(csum_partial(&hdseq, sizeof(hdseq), csum));
+	} else {
+		*ptr++ = htonl(((data_len) << 16) |
+				(TCPOPT_NOP << 8) |
+				(TCPOPT_NOP));
+	}
+
+no_data_seq:
+	tcb->seq = tp->write_seq;
+	tcb->sacked = 0; /* reset the sacked field: from the point of view
+			  * of this subflow, we are sending a brand new
+			  * segment */
+	/* Take into account seg len */
+	tp->write_seq += subskb->len + ((tcb->tcp_flags & TCPHDR_FIN) ? 1 : 0);
+	tcb->end_seq = tp->write_seq;
+
+	/* If it's a non-payload DATA_FIN (also no subflow-fin), the
+	 * segment is not part of the subflow but on a meta-only-level
+	 */
+	if (!mptcp_is_data_fin(subskb) || tcb->end_seq != tcb->seq) {
+		tcp_add_write_queue_tail(sk, subskb);
+		sk->sk_wmem_queued += subskb->truesize;
+		sk_mem_charge(sk, subskb->truesize);
+	}
+
+	return subskb;
+}
+
 static struct sk_buff *mptcp_skb_entail(struct sock *sk, struct sk_buff *skb,
 					int reinject)
 {
@@ -556,6 +706,9 @@ static struct sk_buff *mptcp_skb_entail(struct sock *sk, struct sk_buff *skb,
 	 */
 	tcb = TCP_SKB_CB(subskb);
 	tcb->path_mask = 0;
+
+	// Set data sequence number to data_seq_no before it is gone (modified by kaewon)
+	tcb->data_seq_no = tcb->seq;
 
 	if (mptcp_is_data_fin(subskb))
 		mptcp_combine_dfin(subskb, meta_sk, sk);
@@ -778,6 +931,7 @@ int mptcp_fragment(struct sock *sk, struct sk_buff *skb, u32 len,
 	TCP_SKB_CB(skb)->mptcp_flags = flags & ~(MPTCPHDR_FIN);
 	TCP_SKB_CB(buff)->mptcp_flags = flags;
 	TCP_SKB_CB(buff)->path_mask = TCP_SKB_CB(skb)->path_mask;
+	TCP_SKB_CB(buff)->retx_mask = TCP_SKB_CB(skb)->retx_mask; //added by kaewon
 
 	if (!skb_shinfo(skb)->nr_frags && skb->ip_summed != CHECKSUM_PARTIAL) {
 		/* Copy and checksum data tail into the new buffer. */
@@ -873,6 +1027,7 @@ int mptso_fragment(struct sock *sk, struct sk_buff *skb, unsigned int len,
 	TCP_SKB_CB(skb)->mptcp_flags = flags & ~(MPTCPHDR_FIN);
 	TCP_SKB_CB(buff)->mptcp_flags = flags;
 	TCP_SKB_CB(buff)->path_mask = TCP_SKB_CB(skb)->path_mask;
+	TCP_SKB_CB(buff)->retx_mask = TCP_SKB_CB(skb)->retx_mask; //added by kaewon
 
 	/* This packet was never sent out yet, so no SACK bits. */
 	TCP_SKB_CB(buff)->sacked = 0;
@@ -1083,7 +1238,914 @@ retrans:
 	return NULL;
 }
 
-int mptcp_write_xmit(struct sock *meta_sk, unsigned int mss_now, int nonagle,
+
+//go through meta-queue and find out how many bytes are allocated (return value)
+//and how many bytes can be allocated according to scheduling_ratio (ratio_alloc)
+//should be replaced by a tracking algorithm due to high computational overhead
+//(written by kaewon)
+u64 get_portion_bytes(struct sock *sk, u64 *ratio_alloc, u64 *unacked_bytes)
+{
+        struct tcp_sock *tp = tcp_sk(sk);
+	struct tcp_sock *meta_tp = mptcp_meta_tp(tp);
+        struct sock *meta_sk = tp->meta_sk;
+	struct mptcp_cb *mpcb = meta_tp->mpcb;
+        struct sk_buff *skb_it;
+	struct sock *sk_it;
+        u64 alloc_bytes = 0;
+	u64 wnd_bytes = 0;
+	u32 skb_size;
+	u64 ratio; 
+	u64 total_ratio = 0;
+	u32 cnt = 0;
+	u64 ack_seq = tp->mptcp->last_data_ack;
+	(*unacked_bytes) = 0;
+
+	if(ratio_alloc)
+		*ratio_alloc = 0;
+
+        skb_queue_walk(&meta_sk->sk_write_queue, skb_it) {
+		struct tcp_skb_cb *tcb = TCP_SKB_CB(skb_it);
+		if (before64(tcb->seq, meta_tp->snd_una) || !before64(tcb->seq, tcp_wnd_end(meta_tp)))
+			break;
+		skb_size = tcb->end_seq - tcb->seq;
+		wnd_bytes += skb_size;
+		if (!after64(tcb->end_seq, meta_tp->snd_nxt) 
+			&& (tcb->path_mask & mptcp_pi_to_flag(tp->mptcp->path_index))) {
+			alloc_bytes += skb_size;
+			if (!after64(ack_seq, tcb->seq))
+				(*unacked_bytes) += skb_size;
+		}
+	}
+
+	if(wnd_bytes > meta_tp->snd_wnd) 
+		wnd_bytes = meta_tp->snd_wnd;
+
+	ratio = tp->mptcp->schedule_ratio;
+	if (ratio < 2000000)
+		ratio = 0;
+	else
+		ratio -= 2000000;
+
+	mptcp_for_each_sk(mpcb, sk_it) {
+		struct tcp_sock *tp_it = tcp_sk(sk_it);
+		if(!mptcp_sk_can_send(sk_it))
+			continue;
+		total_ratio += tp_it->mptcp->schedule_ratio;
+		cnt ++;
+	}
+	total_ratio -= cnt * 2000000;
+	if (ratio > total_ratio)
+		ratio = total_ratio;
+	
+	(*ratio_alloc) = (wnd_bytes * ratio)/total_ratio;
+	
+        return alloc_bytes;
+}
+
+
+u64 get_ratio_alloc(struct sock *sk)
+{
+        struct tcp_sock *tp = tcp_sk(sk);
+	struct tcp_sock *meta_tp = mptcp_meta_tp(tp);
+	struct mptcp_cb *mpcb = meta_tp->mpcb;
+	struct sock *sk_it;
+	int cnt = 0;
+	u64 ratio = tp->mptcp->schedule_ratio;
+	u64 wnd_bytes = min_t(u64, meta_tp->snd_wnd, meta_tp->write_seq - meta_tp->snd_una);
+	u64 total_ratio;
+
+	mptcp_for_each_sk(mpcb, sk_it) {
+		struct tcp_sock *tp_it = tcp_sk(sk_it);
+		if(!mptcp_sk_can_send(sk_it))
+			continue;
+		cnt ++;
+	}
+	total_ratio = cnt * 10000000;
+
+	if (ratio > total_ratio)
+		ratio = total_ratio;
+	
+        return (wnd_bytes * ratio)/total_ratio;
+}
+
+u64 get_alloc_byte_ratio(struct sock *sk)
+{
+        struct tcp_sock *tp = tcp_sk(sk);
+	struct tcp_sock *meta_tp = mptcp_meta_tp(tp);
+	u64 total_alloc_byte = meta_tp->snd_nxt - meta_tp->snd_una;
+	struct mptcp_cb *mpcb = meta_tp->mpcb;
+	struct sock *sk_it;
+	int cnt = 0;
+
+	mptcp_for_each_sk(mpcb, sk_it) {
+		struct tcp_sock *tp_it = tcp_sk(sk_it);
+		if(!mptcp_sk_can_send(sk_it))
+			continue;
+		cnt ++;
+	}
+
+        return ((tp->mptcp->alloc_byte * 10000000)/total_alloc_byte) * cnt;
+}
+
+//print out tcp parameters (written by kaewon)
+void print_out_tcp(struct sock *meta_sk)
+{
+	struct tcp_sock *meta_tp = tcp_sk(meta_sk);
+	struct mptcp_cb *mpcb = meta_tp->mpcb;
+	struct sock *sk_it;
+	struct sk_buff *skb_it;
+	u64 current_time = (jiffies * 1000)/HZ; // in msec
+	u64 last_print_out = mpcb->last_print_out;
+	u64 printing_interval = 1; // in msec
+
+	u64 alloc_bytes, ratio_alloc, unacked_bytes;
+
+	if (last_print_out == 0 || current_time >= last_print_out + printing_interval) {
+	      u64 rate;
+	      mpcb->last_print_out = current_time;
+
+	      printk("(time)\t %llu\t", current_time);
+	      //meta queue variables
+	      printk("(snd_una)\t %lu\t", (unsigned long)meta_tp->snd_una);
+	      printk("(snd_nxt)\t %lu\t", (unsigned long)meta_tp->snd_nxt);
+	      printk("(wnd_end)\t %lu\t", (unsigned long)tcp_wnd_end(meta_tp));
+	      printk("(wrt_seq)\t %lu\t", (unsigned long)meta_tp->write_seq);
+	      printk("(snd_wnd)\t %lu\t", (unsigned long)meta_tp->snd_wnd);
+	      printk("(snd_buf)\t %lu\t", (unsigned long)meta_sk->sk_sndbuf);
+	      //data rate
+	      if(mpcb->init_print_out == 0) {
+		  mpcb->init_print_out = current_time;
+		  mpcb->init_snd_una = meta_tp->snd_una;
+		  printk("(avg_rate)\t %lu\t", (unsigned long)0);
+	      } else {
+		  rate = (8*(meta_tp->snd_una - mpcb->init_snd_una))/(current_time - mpcb->init_print_out);
+		  printk("(avg_rate)\t %lu\t", (unsigned long)rate);
+	      }
+	      //last data ack
+	      printk("(last data ack)\t");
+	      mptcp_for_each_sk(mpcb, sk_it) {
+		  struct tcp_sock *tp_it = tcp_sk(sk_it);
+		  if(!mptcp_sk_can_send(sk_it) || tp_it->mptcp->pre_established) continue;
+		  printk("%llu\t", (unsigned long long)tp_it->mptcp->last_data_ack);
+	      }
+	      if (sysctl_mptcp_scheduler == 1) {
+		  //scheduling ratio
+		  printk("(scheduling ratio)\t");
+		  mptcp_for_each_sk(mpcb, sk_it) {
+			struct tcp_sock *tp_it = tcp_sk(sk_it);
+			if(!mptcp_sk_can_send(sk_it) || tp_it->mptcp->pre_established) continue;
+			printk("%lu\t", (unsigned long)tp_it->mptcp->schedule_ratio);
+		  }
+		  //congestion window
+		  printk("(congestion window)\t");
+		  mptcp_for_each_sk(mpcb, sk_it) {
+			struct tcp_sock *tp_it = tcp_sk(sk_it);
+			if(!mptcp_sk_can_send(sk_it) || tp_it->mptcp->pre_established) continue;
+			printk("%lu\t", (unsigned long)(tp_it->snd_cwnd * tcp_current_mss(sk_it)));
+		  }
+		  //allocated bytes
+		  printk("(alloc bytes)\t");
+		  mptcp_for_each_sk(mpcb, sk_it) {
+			struct tcp_sock *tp_it = tcp_sk(sk_it);
+			if(!mptcp_sk_can_send(sk_it) || tp_it->mptcp->pre_established) continue;
+			printk("%llu\t", (unsigned long long)tp_it->mptcp->alloc_byte);
+		  }
+		  //unacked bytes
+		  printk("(unacked bytes)\t");
+		  mptcp_for_each_sk(mpcb, sk_it) {
+			struct tcp_sock *tp_it = tcp_sk(sk_it);
+			if(!mptcp_sk_can_send(sk_it) || tp_it->mptcp->pre_established) continue;
+			printk("%llu\t", (unsigned long long)tp_it->mptcp->unacked_byte);
+		  }
+	      }	      
+	      printk("\n");
+	}
+
+/*
+	printk("\n");
+	printk("[meta_snd_una]	%lu	%lu\n", jiffies, (unsigned long)meta_tp->snd_una);
+	printk("[meta_snd_nxt]	%lu	%lu\n", jiffies, (unsigned long)meta_tp->snd_nxt);
+	printk("[meta_snd_wnd]	%lu	%lu\n", jiffies, (unsigned long)meta_tp->snd_wnd);
+	printk("[meta_wnd_end]	%lu	%lu\n", jiffies, (unsigned long)tcp_wnd_end(meta_tp));
+	printk("[meta_wrt_seq]	%lu	%lu\n", jiffies, (unsigned long)meta_tp->write_seq);
+	printk("[meta_snd_buf]	%lu	%lu\n", jiffies, (unsigned long)meta_sk->sk_sndbuf);
+//	printk("[meta_queue]");
+//	skb_queue_walk(&meta_sk->sk_write_queue, skb_it) {
+//		struct tcp_skb_cb *tcb = TCP_SKB_CB(skb_it);
+//		printk(" (%lu, %lu)", (unsigned long)tcb->path_mask, (unsigned long)(tcb->end_seq - tcb->seq));
+//	}
+//	printk("\n");
+
+	mptcp_for_each_sk(mpcb, sk_it) {
+                struct tcp_sock *tp_it = tcp_sk(sk_it);
+//		u64 alloc_bytes, ratio_alloc, unacked_bytes;
+		unsigned long ind = (unsigned long)tp_it->mptcp->path_index;
+                if(!mptcp_sk_can_send(sk_it))
+                        continue;
+
+		printk("[sub_snd_una_%lu]	%lu	%lu\n", ind, jiffies, (unsigned long)tp_it->snd_una);
+		printk("[sub_snd_nxt_%lu]	%lu	%lu\n", ind, jiffies, (unsigned long)tp_it->snd_nxt);
+		printk("[sub_snd_wnd_%lu]	%lu	%lu\n", ind, jiffies, (unsigned long)tp_it->snd_wnd);
+		printk("[sub_snd_buf_%lu]	%lu	%lu\n", ind, jiffies, (unsigned long)sk_it->sk_sndbuf);
+		printk("[cong_wnd_%lu]	%lu	%lu\n", ind, jiffies, (unsigned long)(tp_it->snd_cwnd * tcp_current_mss(sk_it)));
+		printk("[sched_ratio_%lu]	%lu	%lu\n", ind, jiffies, (unsigned long)tp_it->mptcp->schedule_ratio);
+		printk("[alloc_ratio_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)get_alloc_byte_ratio(sk_it));
+		printk("[last_data_ack_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)tp_it->mptcp->last_data_ack);
+//		alloc_bytes = get_portion_bytes(sk_it, &ratio_alloc, &unacked_bytes);	
+//		printk("[ratio_alloc_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)ratio_alloc);
+		printk("[ratio_alloc_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)get_ratio_alloc(sk_it));
+//		printk("[alloc_bytes_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)alloc_bytes);
+		printk("[alloc_byte_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)tp_it->mptcp->alloc_byte);
+//		printk("[unacked_bytes_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)unacked_bytes);
+		printk("[unacked_byte_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)tp_it->mptcp->unacked_byte);
+		printk("[retx_seq_%lu]	%lu	%llu\n", ind, jiffies, (unsigned long long)tp_it->mptcp->retx_seq);
+//		printk("[sub_queue_%lu]", ind);
+//		skb_queue_walk(&sk_it->sk_write_queue, skb_it) {
+//			struct tcp_skb_cb *tcb = TCP_SKB_CB(skb_it);
+//			printk(" (%lu)", (unsigned long)(tcb->end_seq - tcb->seq));
+//		}
+//		printk("\n");
+	}
+	printk("\n");
+*/
+
+}
+
+
+
+
+//test if the subflow is available
+//(modified by kaewon)
+static int mptcp_subflow_available(struct sock *sk, unsigned int *mss)
+{
+	struct tcp_sock *tp = tcp_sk(sk);
+	unsigned int mss_now;
+
+	/* Set of states for which we are allowed to send data */
+	if (!mptcp_sk_can_send(sk))
+		return 0;
+
+	/* We do not send data on this subflow unless it is
+	 * fully established, i.e. the 4th ack has been received.
+	 */
+	if (tp->mptcp->pre_established)
+		return 0;
+
+	if (tp->pf ||
+	    (tp->mpcb->noneligible & mptcp_pi_to_flag(tp->mptcp->path_index)))
+		return 0;
+
+	if (inet_csk(sk)->icsk_ca_state == TCP_CA_Loss) {
+		/* If SACK is disabled, and we got a loss, TCP does not exist
+		 * the loss-state until something above high_seq has been acked.
+		 * (see tcp_try_undo_recovery)
+		 *
+		 * high_seq is the snd_nxt at the moment of the RTO. As soon
+		 * as we have an RTO, we won't push data on the subflow.
+		 * Thus, snd_una can never go beyond high_seq.
+		 */
+		if (!tcp_is_reno(tp))
+			return 0;
+		else if (tp->snd_una != tp->high_seq)
+			return 0;
+	}
+	
+	//cwnd test is done in mptcp_write_xmit (modified by kaewon)
+	//if (!tcp_cwnd_test(tp, NULL))
+	//	return 0;
+
+	mss_now = tcp_current_mss(sk);
+	/* Don't send on this subflow if we bypass the allowed send-window at
+	 * the per-subflow level. Similar to tcp_snd_wnd_test, but manually
+	 * calculated end_seq (because here at this point end_seq is still at
+	 * the meta-level).
+	 */
+	/* Why this should be checked? There must be no send window limitation
+	 * in the subflow level.
+	 */
+	if (after(tp->write_seq + mss_now, tcp_wnd_end(tp)))
+		return 0;
+
+	if (mss)
+		*mss = mss_now;
+
+	return 1;
+}
+
+//calculate scheduling priority 
+//(written by kaewon)
+u32 mptcp_subflow_portion(struct sock *meta_sk, struct sock *sk)
+{
+	struct tcp_sock *subtp = tcp_sk(sk);
+	u64 ratio = subtp->mptcp->schedule_ratio;
+	u64 alloc_byte = subtp->mptcp->alloc_byte;
+
+	if (alloc_byte >= ratio)
+		return 0;
+	
+	if (alloc_byte == 0) 
+		return ratio;
+
+	return ratio/alloc_byte;
+}
+
+//select subflow 
+//(modified by kaewon)
+static struct sock *mptcp_select_subflow(struct sock *meta_sk,		
+					  unsigned int *mss_now)
+{
+	struct mptcp_cb *mpcb = tcp_sk(meta_sk)->mpcb;
+	struct sock *sk, *ssk = NULL, *bestsk = NULL, *lowpriosk = NULL, *backupsk = NULL;
+	unsigned int mss = 0, mss_lowprio = 0, mss_backup = 0;
+	u32 max_portion = 0, lowprio_max_portion = 0;
+	int cnt_backups = 0;
+
+	/* if there is only one subflow, bypass the scheduling function */
+	if (mpcb->cnt_subflows == 1) {
+		bestsk = (struct sock *)mpcb->connection_list;
+		if (!mptcp_subflow_available(bestsk, mss_now))
+			bestsk = NULL;
+		return bestsk;
+	}
+
+	/* First, find the best subflow */
+	mptcp_for_each_sk(mpcb, sk) {
+		struct tcp_sock *tp = tcp_sk(sk);
+		u32 portion = mptcp_subflow_portion(meta_sk, sk);	
+		int this_mss;
+
+		if (tp->mptcp->rcv_low_prio || tp->mptcp->low_prio)
+			cnt_backups++;
+
+		if ((tp->mptcp->rcv_low_prio || tp->mptcp->low_prio) &&
+		    portion >= lowprio_max_portion) {
+			if (!mptcp_subflow_available(sk, &this_mss))
+				continue;
+
+			lowprio_max_portion = portion;
+			lowpriosk = sk;
+			mss_lowprio = this_mss;
+		} else if (!(tp->mptcp->rcv_low_prio || tp->mptcp->low_prio) &&
+			   portion >= max_portion) {
+			if (!mptcp_subflow_available(sk, &this_mss))
+				continue;
+
+			max_portion = portion;
+			bestsk = sk;
+			mss = this_mss;
+		}
+	}
+
+	if (mpcb->cnt_established == cnt_backups && lowpriosk) {
+		mss = mss_lowprio;
+		ssk = lowpriosk;
+	} else if (bestsk) {
+		ssk = bestsk;
+	}
+
+	if (mss_now)
+		*mss_now = mss;
+
+	return ssk;
+}
+
+//select segment 
+//(written by kaewon)
+struct sk_buff *mptcp_select_segment(struct sock *meta_sk, struct sock *subsk, int *state)
+{
+	struct tcp_sock *meta_tp = tcp_sk(meta_sk);
+	struct mptcp_cb *mpcb = meta_tp->mpcb;
+	struct sk_buff *skb = NULL;
+	struct sk_buff *skb_it;
+	struct tcp_sock *subtp = tcp_sk(subsk);
+	int mss_now = tcp_current_mss(subsk);
+
+	// When this subflow is blocked (reconnection method should be implemented)
+	if (subtp->mptcp->schedule_ratio == 0) {
+		*state = -1;
+		return NULL;
+	}
+	
+
+	skb = tcp_send_head(meta_sk);
+
+	/* Successfully find a new fresh skb and no portion block */
+	if (skb && tcp_snd_wnd_test(meta_tp, skb, mss_now) && subtp->mptcp->unacked_byte <= get_ratio_alloc(subsk)) {
+		*state = 1;
+		return skb;
+	}
+
+	/* Finding an skb for meta retransmission */
+	// There is still an unacked packet. Not yet time for retransmission 
+	if (subtp->mptcp->unacked_byte > 0) {
+		*state = -1;
+		return NULL;
+	}
+
+	//printk("[meta_queue_retx] (%u) ", subtp->mptcp->path_index);
+	skb_queue_walk(&meta_sk->sk_write_queue, skb_it) {
+		struct tcp_skb_cb *tcb = TCP_SKB_CB(skb_it);
+		if (tcb->path_mask == 0) 
+			break;
+		if (before64(tcb->seq, subtp->mptcp->retx_seq)) {
+			//printk("s ");
+			continue;	
+		}
+		if (!before64(tcb->seq, subtp->mptcp->last_data_ack))
+			break;
+		if (!(tcb->path_mask & mptcp_pi_to_flag(subtp->mptcp->path_index))) {
+			//printk("[retransmission] %lu %u %lu\n", jiffies, subtp->mptcp->path_index, subtp->mptcp->retx_seq);
+			//printk("r\n");
+			subtp->mptcp->retx_seq = tcb->end_seq;
+			*state = 0;
+			return skb_it;
+		}
+		//printk("0 ");
+	}
+	//printk("\n");
+
+
+	/* Nothing can be allocated to this subflow */
+	*state = -1;
+	return NULL;
+}
+
+
+int mptcp_write_xmit_modified_old(struct sock *meta_sk, unsigned int mss_now, int nonagle,
+		     int push_one, gfp_t gfp)
+{
+	struct tcp_sock *meta_tp = tcp_sk(meta_sk), *subtp, *tp_it;
+	struct sock *subsk;
+	struct mptcp_cb *mpcb = meta_tp->mpcb;
+	struct sk_buff *skb;
+	unsigned int tso_segs, sent_pkts;
+	int cwnd_quota;
+	int result;
+	struct tcp_sock *tp1, *tp2, *tmp;
+
+	sent_pkts = 0;
+
+	/* Currently mtu-probing is not done in MPTCP */
+	if (!push_one && 0) {
+		/* Do MTU probing. */
+		result = tcp_mtu_probe(meta_sk);
+		if (!result)
+			return 0;
+		else if (result > 0)
+			sent_pkts = 1;
+	}
+
+//For testing. 
+//	if((tp2 = mpcb->connection_list) && (tmp = tp2->mptcp->next) && (tmp = tmp->mptcp->next) && (tp1 = tmp->mptcp->next)) {
+//		 tp1->mptcp->schedule_ratio = 18000000;
+//		 tp2->mptcp->schedule_ratio = 2000000;
+//	}
+
+//For testing. 
+//	if((tp2 = mpcb->connection_list) && (tmp = tp2->mptcp->next) && (tmp = tmp->mptcp->next) && (tp1 = tmp->mptcp->next)) {
+//		 tp1->snd_cwnd = 10;
+//		 tp2->snd_cwnd = 5;
+//	}
+
+
+	while ((subsk = mptcp_select_subflow(meta_sk, &mss_now))) {
+		unsigned int limit;
+		struct sk_buff *subskb = NULL;
+		int state;
+		subtp = tcp_sk(subsk);
+		
+		//printk("[meta_queue_select] %lu (%u)", jiffies, subtp->mptcp->path_index);
+
+		if (!tcp_cwnd_test(subtp, NULL)){
+			//printk(" cwnd block! \n");
+			mpcb->noneligible |= mptcp_pi_to_flag(subtp->mptcp->path_index);
+			continue;
+		}
+
+		/* New transmission (state 1): there is a new fresh skb to transmit.
+		 * Retransmission (state 0): Meta-retransmission.
+		 * No transmission (state -1): Nothing can be transmitted for this subflow */
+		skb = mptcp_select_segment(meta_sk, subsk, &state);
+
+/*
+		if (state == 1)
+			printk(" new transmission! \n");
+		if (state == 0)
+			printk(" retransmission! \n");
+		if (state == -1)
+			printk(" nothing! \n");
+*/
+
+		/* If nothing can be transmitted for this subflow, set it nonelegible */
+		if(state == -1) {
+			mpcb->noneligible |= mptcp_pi_to_flag(subtp->mptcp->path_index);
+			continue;
+		}
+
+		/* If the segment was cloned (e.g. a meta retransmission),
+		 * the header must be expanded/copied so that there is no
+		 * corruption of TSO information.
+		 */
+		if (skb_unclone(skb, GFP_ATOMIC))
+			break;
+
+		tcp_set_skb_tso_segs(meta_sk, skb, mss_now);
+		tso_segs = tcp_skb_pcount(skb);
+
+		limit = mss_now;
+
+		if (tso_segs > 1 && !tcp_urg_mode(meta_tp)) {
+			cwnd_quota = tcp_cwnd_test(subtp, skb);
+			limit = tcp_mss_split_point(subsk, skb, mss_now,
+						    min_t(unsigned int,
+							  cwnd_quota,
+							  subsk->sk_gso_max_segs));
+		}
+
+		if (skb->len > limit &&
+		    unlikely(mptso_fragment(meta_sk, skb, limit, mss_now, gfp, 0)))
+			break;
+
+		if (state == 1)
+			subskb = mptcp_skb_entail_modified(subsk, skb, 0);
+		else
+			subskb = mptcp_skb_entail_modified(subsk, skb, 1);
+		if (!subskb)
+			break;
+
+		TCP_SKB_CB(skb)->when = tcp_time_stamp;
+		TCP_SKB_CB(subskb)->when = tcp_time_stamp;
+		if (unlikely(tcp_transmit_skb(subsk, subskb, 1, gfp))) {
+			mptcp_transmit_skb_failed(subsk, skb, subskb);
+			mpcb->noneligible |= mptcp_pi_to_flag(subtp->mptcp->path_index);
+			continue;
+		}
+
+		if (state == 1) {
+			mptcp_check_sndseq_wrap(meta_tp,
+						TCP_SKB_CB(skb)->end_seq -
+						TCP_SKB_CB(skb)->seq);
+			tcp_event_new_data_sent(meta_sk, skb);
+		}
+
+		tcp_minshall_update(meta_tp, mss_now, skb);
+		sent_pkts += tcp_skb_pcount(skb);
+		tcp_sk(subsk)->mptcp->sent_pkts += tcp_skb_pcount(skb);
+
+		mptcp_sub_event_new_data_sent(subsk, subskb, skb);
+
+		if (push_one)
+			break;
+	}
+
+	mpcb->noneligible = 0;
+
+	if (!(sysctl_mptcp_print_log == 0))
+		print_out_tcp(meta_sk);
+
+	if (likely(sent_pkts)) {
+		mptcp_for_each_sk(mpcb, subsk) {
+			subtp = tcp_sk(subsk);
+			if (subtp->mptcp->sent_pkts) {
+				if (tcp_in_cwnd_reduction(subsk))
+					subtp->prr_out += subtp->mptcp->sent_pkts;
+				//cwnd validation is disabled
+				//tcp_cwnd_validate(subsk);
+				subtp->mptcp->sent_pkts = 0;
+			}
+		}
+		return 0;
+	}
+
+	return !meta_tp->packets_out && tcp_send_head(meta_sk);
+}
+
+
+int mptcp_write_xmit_modified(struct sock *meta_sk, unsigned int mss_now, int nonagle,
+		     int push_one, gfp_t gfp)
+{
+	struct tcp_sock *meta_tp = tcp_sk(meta_sk);
+	struct sock *sk;
+	struct mptcp_cb *mpcb = meta_tp->mpcb;
+	unsigned int sent_pkts = 0;
+	u64 total_ratio;
+	int subflow_num = 0;
+	u32 noneligible = 0;
+	u64 wnd_bytes;
+	int send_result;
+	int eligible_flag;
+	struct sk_buff *f_skb;
+	u32 f_path_mask;
+	int count;
+	int fixed_schedule_ratio;
+
+	// test if scheduling ratio is fixed
+	fixed_schedule_ratio = 0;
+	for (count = 0; count < 8; count ++) {
+		if (sysctl_mptcp_schedule_ratio[count] != 0)
+		      fixed_schedule_ratio = 1;
+	}
+
+	// setting cwnd according to sysctl_cwnd
+	count = 0;
+	mptcp_for_each_sk(mpcb, sk) {
+		struct tcp_sock *tp = tcp_sk(sk);
+		int cwnd;
+		if(!mptcp_sk_can_send(sk) || tp->mptcp->pre_established)
+			continue;
+		cwnd = sysctl_mptcp_cwnd[count];
+		if (cwnd != 0) tp->snd_cwnd = cwnd;
+		count ++;
+		if (count > 7) break;
+	}
+
+	if(sysctl_mptcp_sndwnd != 0) {
+		meta_tp->snd_wnd = sysctl_mptcp_sndwnd;
+	}
+
+	//calculating total scheduling ratio and number of subflows
+	mptcp_for_each_sk(mpcb, sk) {
+		struct tcp_sock *tp = tcp_sk(sk);
+		if(!mptcp_sk_can_send(sk) || tp->mptcp->pre_established)
+			continue;
+		subflow_num ++;
+	}
+	total_ratio = subflow_num * 10000000;
+
+	//calculating the number of bytes inside the send window
+	wnd_bytes = min_t(u64, meta_tp->snd_wnd, meta_tp->write_seq - meta_tp->snd_una);
+
+	//set noneligibility of subflows
+	mptcp_for_each_sk(mpcb, sk) {
+		struct tcp_sock *tp = tcp_sk(sk);
+		if (!mptcp_sk_can_send(sk) || tp->mptcp->pre_established || (tp->mptcp->schedule_ratio == 0))
+			   noneligible |= mptcp_pi_to_flag(tp->mptcp->path_index);
+	}
+
+	//new transmission
+	while (1) {
+		struct sk_buff *skb;
+		struct sock *best_sk = NULL;
+		unsigned int best_mss = 0;
+		u64 max_portion = 0;
+
+		skb = tcp_send_head(meta_sk);
+		//if there is no packet in the send head, just quit new transmission.
+		if (!skb)
+		      break;
+
+		/* Find the best subflow */
+		if (!fixed_schedule_ratio) {
+		      //scheduling ratio is not fixed. allocate skb to other subflow if the best subflow is blocked by cwnd.
+		      mptcp_for_each_sk(mpcb, sk) {
+			      struct tcp_sock *tp = tcp_sk(sk);
+			      u64 ratio, alloc_byte, ratio_alloc, portion;
+			      unsigned int mss = tcp_current_mss(sk);
+
+                              //if this subflow is checked noneligible, skip this one
+                              if (noneligible & mptcp_pi_to_flag(tp->mptcp->path_index))
+                                      continue;
+
+			      //if the congestion window is full, set noneligible and skip
+			      if (!tcp_cwnd_test(tp, NULL)) {
+				      noneligible |= mptcp_pi_to_flag(tp->mptcp->path_index);
+				      continue;
+			      }
+
+			      //if the send window is violated, just skip this subflow.
+			      if (!tcp_snd_wnd_test(meta_tp, skb, mss))
+				      continue;
+
+			      //if too much skbs are already allocated to this subflow, set noneligible and skip
+			      ratio = tp->mptcp->schedule_ratio;
+			      if (ratio > total_ratio)
+				      ratio = total_ratio;
+			      ratio_alloc = (wnd_bytes * ratio)/total_ratio;
+			      if (tp->mptcp->unacked_byte >= ratio_alloc) {
+				      noneligible |= mptcp_pi_to_flag(tp->mptcp->path_index);
+				      continue;
+			      }
+
+			      //calculate portion
+			      alloc_byte = tp->mptcp->alloc_byte;
+			      if (alloc_byte >= ratio) {
+				      portion = 0;
+			      } else if (alloc_byte == 0) {
+				      portion = ratio;
+			      } else {
+				      portion = ratio/alloc_byte;
+			      }
+
+			      //if the portion of this subflow is higher than the current maximum, replace it with this subflow
+			      if (portion >= max_portion) {
+				      max_portion = portion;
+				      best_sk = sk;
+				      best_mss = mss;
+			      }
+		      }
+		} else {
+			//scheduling ratio is fixed. allocate skb only to the best subflow
+			mptcp_for_each_sk(mpcb, sk) {
+			      struct tcp_sock *tp = tcp_sk(sk);
+			      u64 ratio, alloc_byte, ratio_alloc, portion;
+			      unsigned int mss = tcp_current_mss(sk);
+
+			      //if the congestion window is full, set noneligible
+			      if (!tcp_cwnd_test(tp, NULL))
+				      noneligible |= mptcp_pi_to_flag(tp->mptcp->path_index);
+
+			      //if the send window is violated, just skip this subflow.
+			      if (!tcp_snd_wnd_test(meta_tp, skb, mss))
+				      continue;
+
+			      //calculate portion
+			      ratio = tp->mptcp->schedule_ratio;
+			      if (ratio > total_ratio)
+				      ratio = total_ratio;
+			      alloc_byte = tp->mptcp->alloc_byte;
+			      if (alloc_byte >= ratio) {
+				      portion = 0;
+			      } else if (alloc_byte == 0) {
+				      portion = ratio;
+			      } else {
+				      portion = ratio/alloc_byte;
+			      }
+
+			      //if the portion of this subflow is higher than the current maximum, replace it with this subflow
+			      if (portion >= max_portion) {
+				      max_portion = portion;
+				      best_sk = sk;
+				      best_mss = mss;
+			      }
+			}
+		}
+
+		//if all subflows are noneligible, quit new transmission
+		if(best_sk == NULL) {
+			break;
+		}
+
+		//if the best subflow is noneligible, quit new transmission (fixed scheduling ratio case)
+		if(noneligible & mptcp_pi_to_flag(tcp_sk(best_sk)->mptcp->path_index)) {
+			break;
+		}
+
+		send_result = mptcp_send_pkt(meta_sk, best_sk, skb, 1, best_mss, nonagle, push_one, gfp);
+		if(send_result == -1) {
+			break;
+		} else if(send_result == 0) {
+			noneligible |= mptcp_pi_to_flag(tcp_sk(best_sk)->mptcp->path_index);
+		} else if(send_result >= 1) {
+			sent_pkts += send_result;
+		}
+	}
+
+	//get the first skb from the write queue & setting noneligibiligy for retransmission
+	//retransmission is tried only when there is an already allocated skb and at least one available subflow
+
+	f_skb = skb_peek(&meta_sk->sk_write_queue);
+	eligible_flag = 0;
+	if(f_skb) {
+		f_path_mask = TCP_SKB_CB(f_skb)->path_mask;
+		if(f_path_mask) {
+			mptcp_for_each_sk(mpcb, sk) {
+				struct tcp_sock *tp = tcp_sk(sk);
+				if (tp->mptcp->unacked_byte > 0 || tp->mptcp->alloc_byte == 0 || !tcp_cwnd_test(tp, NULL) || (f_path_mask & mptcp_pi_to_flag(tp->mptcp->path_index)))
+					noneligible |= mptcp_pi_to_flag(tp->mptcp->path_index);
+				if (!(noneligible & mptcp_pi_to_flag(tp->mptcp->path_index)))
+					eligible_flag = 1;
+			}
+		}
+	}
+
+	//retransmission
+	if (sysctl_mptcp_retx !=0 && eligible_flag == 1 && send_result != -1)
+	{
+		struct sk_buff *skb;
+		skb_queue_walk(&meta_sk->sk_write_queue, skb) {
+			struct tcp_skb_cb *tcb = TCP_SKB_CB(skb);
+			if (tcb->path_mask == 0)
+				break;
+			if (!(f_path_mask & tcb->path_mask))
+				continue;
+			mptcp_for_each_sk(mpcb, sk) {
+				unsigned int mss;
+				struct tcp_sock *tp = tcp_sk(sk);
+				if (noneligible & mptcp_pi_to_flag(tp->mptcp->path_index))
+					continue;
+				if (!tcp_cwnd_test(tp, NULL)) {
+					noneligible |= mptcp_pi_to_flag(tp->mptcp->path_index);
+					continue;
+				}
+				//if this skb is already allocated to this subflow, skip this subflow.
+				if (tcb->retx_mask & mptcp_pi_to_flag(tp->mptcp->path_index))
+					continue;
+				mss = tcp_current_mss(sk);
+				send_result = mptcp_send_pkt(meta_sk, sk, skb, 0, mss, nonagle, push_one, gfp);
+				if(send_result == -1) {
+					break;
+				} else if(send_result == 0) {
+					noneligible |= mptcp_pi_to_flag(tcp_sk(sk)->mptcp->path_index);
+				} else if(send_result >= 1) {
+					sent_pkts += send_result;
+				}
+			}
+			if(send_result == -1) break;
+		}
+	}
+
+
+	if (!(sysctl_mptcp_print_log == 0))
+		print_out_tcp(meta_sk);
+
+	if (likely(sent_pkts)) {
+		mptcp_for_each_sk(mpcb, sk) {
+			struct tcp_sock *tp = tcp_sk(sk);
+			if (tp->mptcp->sent_pkts) {
+				if (tcp_in_cwnd_reduction(sk))
+					tp->prr_out += tp->mptcp->sent_pkts;
+				//cwnd validation is disabled
+				//tcp_cwnd_validate(subsk);
+				tp->mptcp->sent_pkts = 0;
+			}
+		}
+		return 0;
+	}
+
+	return !meta_tp->packets_out && tcp_send_head(meta_sk);
+}
+
+int mptcp_send_pkt(struct sock *meta_sk, struct sock *subsk, struct sk_buff *skb, int newtx, unsigned int mss_now, int nonagle,
+                     int push_one, gfp_t gfp) {
+
+      // return values: -1: abort scheduling, 0: mark subsk ineligible and continue scheduling, >=1: sending successful (number of sent packets)
+      struct tcp_sock *meta_tp = tcp_sk(meta_sk);
+      struct tcp_sock *subtp = tcp_sk(subsk);
+      unsigned int tso_segs, sent_pkts;
+      int cwnd_quota;
+      unsigned int limit;
+      struct sk_buff *subskb = NULL;
+      sent_pkts = 0;
+
+      /* If the segment was cloned (e.g. a meta retransmission),
+      * the header must be expanded/copied so that there is no
+      * corruption of TSO information.
+      */
+      if (skb_unclone(skb, GFP_ATOMIC))
+          return -1;
+
+      tcp_set_skb_tso_segs(meta_sk, skb, mss_now);
+      tso_segs = tcp_skb_pcount(skb);
+
+      limit = mss_now;
+
+      if (tso_segs > 1 && !tcp_urg_mode(meta_tp)) {
+              cwnd_quota = tcp_cwnd_test(subtp, skb);
+              limit = tcp_mss_split_point(subsk, skb, mss_now,
+                                    min_t(unsigned int,
+                                          cwnd_quota,
+                                          subsk->sk_gso_max_segs));
+      }
+
+      if (skb->len > limit &&
+      unlikely(mptso_fragment(meta_sk, skb, limit, mss_now, gfp, 0)))
+            return -1;
+
+      if (newtx == 1)
+            subskb = mptcp_skb_entail_modified(subsk, skb, 0);
+      else
+            subskb = mptcp_skb_entail_modified(subsk, skb, 1);
+      if (!subskb)
+            return -1;
+
+      TCP_SKB_CB(skb)->when = tcp_time_stamp;
+      TCP_SKB_CB(subskb)->when = tcp_time_stamp;
+      if (unlikely(tcp_transmit_skb(subsk, subskb, 1, gfp))) {
+              mptcp_transmit_skb_failed(subsk, skb, subskb);
+              return 0;
+      }
+
+      if (newtx == 1) {
+              mptcp_check_sndseq_wrap(meta_tp,
+                                TCP_SKB_CB(skb)->end_seq -
+                                TCP_SKB_CB(skb)->seq);
+              tcp_event_new_data_sent(meta_sk, skb);
+      }
+
+      tcp_minshall_update(meta_tp, mss_now, skb);
+      sent_pkts += tcp_skb_pcount(skb);
+      tcp_sk(subsk)->mptcp->sent_pkts += tcp_skb_pcount(skb);
+
+      mptcp_sub_event_new_data_sent(subsk, subskb, skb);
+
+      if (push_one)
+            return -1;
+
+      return sent_pkts;
+}
+
+
+int mptcp_write_xmit_original(struct sock *meta_sk, unsigned int mss_now, int nonagle,
 		     int push_one, gfp_t gfp)
 {
 	struct tcp_sock *meta_tp = tcp_sk(meta_sk), *subtp;
@@ -1254,6 +2316,9 @@ retry:
 
 	mpcb->noneligible = 0;
 
+	if (!(sysctl_mptcp_print_log == 0))
+		print_out_tcp(meta_sk);
+
 	if (likely(sent_pkts)) {
 		mptcp_for_each_sk(mpcb, subsk) {
 			subtp = tcp_sk(subsk);
@@ -1269,6 +2334,16 @@ retry:
 
 	return !meta_tp->packets_out && tcp_send_head(meta_sk);
 }
+
+int mptcp_write_xmit(struct sock *meta_sk, unsigned int mss_now, int nonagle,
+		     int push_one, gfp_t gfp)
+{
+	if (sysctl_mptcp_scheduler == 0)
+		return mptcp_write_xmit_original(meta_sk, mss_now, nonagle, push_one, gfp);
+	else
+		return mptcp_write_xmit_modified(meta_sk, mss_now, nonagle, push_one, gfp);
+}
+
 
 void mptcp_write_space(struct sock *sk)
 {
@@ -1488,18 +2563,34 @@ void mptcp_established_options(struct sock *sk, struct sk_buff *skb,
 		*size += MPTCP_SUB_LEN_JOIN_ACK_ALIGN;
 	}
 
+
 	if (!tp->mptcp_add_addr_ack && !tp->mptcp->include_mpc &&
 	    !tp->mptcp->pre_established) {
-		opts->options |= OPTION_MPTCP;
-		opts->mptcp_options |= OPTION_DATA_ACK;
 		/* If !skb, we come from tcp_current_mss and thus we always
 		 * assume that the DSS-option will be set for the data-packet.
 		 */
-		if (skb && !mptcp_is_data_seq(skb)) {
-			opts->data_ack = meta_tp->rcv_nxt;
+		int fixed_schedule_ratio;
+		int count;
 
-			*size += MPTCP_SUB_LEN_ACK_ALIGN;
+                // test if scheduling ratio is fixed
+                fixed_schedule_ratio = 0;
+                for (count = 0; count < 8; count ++) {
+                        if (sysctl_mptcp_schedule_ratio[count] != 0)
+                              fixed_schedule_ratio = 1;
+                }
+                if (skb && !mptcp_is_data_seq(skb)) {
+                        // send data ack only when data ack is needed in the case of fixed scheduling ratio for the proposed scheduler. (added by kaewon)
+                        if (sysctl_mptcp_scheduler == 0 || fixed_schedule_ratio == 0 || mpcb->data_ack_needed == 1) {
+                              opts->options |= OPTION_MPTCP;
+                              opts->mptcp_options |= OPTION_DATA_ACK;
+                              opts->data_ack = meta_tp->rcv_nxt;
+                              *size += MPTCP_SUB_LEN_ACK_ALIGN;
+                              *size += MPTCP_SUB_LEN_DSS_ALIGN;
+                              mpcb->data_ack_needed = 0;
+                        }
 		} else {
+			opts->options |= OPTION_MPTCP;
+			opts->mptcp_options |= OPTION_DATA_ACK;
 			opts->data_ack = meta_tp->rcv_nxt;
 
 			/* Doesn't matter, if csum included or not. It will be
@@ -1507,10 +2598,10 @@ void mptcp_established_options(struct sock *sk, struct sk_buff *skb,
 			 */
 			*size += MPTCP_SUB_LEN_ACK_ALIGN +
 				 MPTCP_SUB_LEN_SEQ_ALIGN;
-		}
-
-		*size += MPTCP_SUB_LEN_DSS_ALIGN;
+			*size += MPTCP_SUB_LEN_DSS_ALIGN;
+		}		
 	}
+
 
 	if (mpcb->pm_ops->addr_signal)
 		mpcb->pm_ops->addr_signal(sk, size, opts, skb);
@@ -2139,7 +3230,8 @@ void mptcp_select_initial_window(int *__space, __u32 *window_clamp,
 
 unsigned int mptcp_current_mss(struct sock *meta_sk)
 {
-	unsigned int mss = 0;
+// New code written by kaewon
+	unsigned int mss = 0xffff;
 	struct sock *sk;
 
 	mptcp_for_each_sk(tcp_sk(meta_sk)->mpcb, sk) {
@@ -2149,19 +3241,40 @@ unsigned int mptcp_current_mss(struct sock *meta_sk)
 			continue;
 
 		this_mss = tcp_current_mss(sk);
-		if (this_mss > mss)
+		if (this_mss < mss)
 			mss = this_mss;
 	}
 
-	/* If no subflow is available, we take a default-mss from the
-	 * meta-socket.
-	 */
-	return !mss ? tcp_current_mss(meta_sk) : mss;
+	if (mss == 0xffff)
+		return tcp_current_mss(meta_sk);
+	else
+		return mss;
+// Original Code
+//	unsigned int mss = 0;
+//	struct sock *sk;
+
+//	mptcp_for_each_sk(tcp_sk(meta_sk)->mpcb, sk) {
+//		int this_mss;
+
+//		if (!mptcp_sk_can_send(sk))
+//			continue;
+
+//		this_mss = tcp_current_mss(sk);
+//		if (this_mss > mss)
+//			mss = this_mss;
+//	}
+
+
+//	/* If no subflow is available, we take a default-mss from the
+//	 * meta-socket.
+//	 */
+//	return !mss ? tcp_current_mss(meta_sk) : mss;
 }
 
 int mptcp_select_size(const struct sock *meta_sk, bool sg)
 {
-	int mss = 0; /* We look for the smallest MSS */
+// new code written by kaewon
+	unsigned int mss = 0xffff; /* We look for the smallest MSS */
 	struct sock *sk;
 
 	mptcp_for_each_sk(tcp_sk(meta_sk)->mpcb, sk) {
@@ -2171,9 +3284,24 @@ int mptcp_select_size(const struct sock *meta_sk, bool sg)
 			continue;
 
 		this_mss = tcp_sk(sk)->mss_cache;
-		if (this_mss > mss)
+		if (this_mss < mss)
 			mss = this_mss;
 	}
+//
+
+//	int mss = 0; /* We look for the smallest MSS */
+//	struct sock *sk;
+//
+//	mptcp_for_each_sk(tcp_sk(meta_sk)->mpcb, sk) {
+//		int this_mss;
+//
+//		if (!mptcp_sk_can_send(sk))
+//			continue;
+//
+//		this_mss = tcp_sk(sk)->mss_cache;
+//		if (this_mss > mss)
+//			mss = this_mss;
+//	}
 
 	if (sg) {
 		if (mptcp_sk_can_gso(meta_sk)) {
@@ -2186,8 +3314,13 @@ int mptcp_select_size(const struct sock *meta_sk, bool sg)
 				mss = pgbreak;
 		}
 	}
-
-	return !mss ? tcp_sk(meta_sk)->mss_cache : mss;
+// new code written by kaewon
+	if (mss == 0xffff)
+		return tcp_sk(meta_sk)->mss_cache;
+	else
+		return mss;
+//
+//	return !mss ? tcp_sk(meta_sk)->mss_cache : mss;
 }
 
 int mptcp_check_snd_buf(const struct tcp_sock *tp)

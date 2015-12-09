@@ -5552,3 +5552,7 @@
 /root/mptcp/net/nonet.c
 /root/mptcp/net/socket.c
 /root/mptcp/net/sysctl_net.c
+arch/sim/test/buildtop/source/ns-3-dce/myscripts/dce-mp/wscript
+arch/sim/test/buildtop/source/ns-3-dce/myscripts/dce-mp/dce-mp.cc
+arch/sim/test/buildtop/source/ns-3-dce/dce-mp.sh
+Makefile

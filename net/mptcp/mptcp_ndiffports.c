@@ -14,7 +14,7 @@ struct ndiffports_priv {
 	struct mptcp_cb *mpcb;
 };
 
-static int sysctl_mptcp_ndiffports __read_mostly = 2;
+static int sysctl_mptcp_ndiffports __read_mostly = 16;
 
 /**
  * Create all new subflows, by doing calls to mptcp_initX_subsockets

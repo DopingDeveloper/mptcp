@@ -66,6 +66,12 @@ int sysctl_mptcp_checksum __read_mostly = 1;
 int sysctl_mptcp_debug __read_mostly;
 EXPORT_SYMBOL(sysctl_mptcp_debug);
 int sysctl_mptcp_syn_retries __read_mostly = 3;
+int sysctl_mptcp_scheduler __read_mostly = 0;
+int sysctl_mptcp_retx __read_mostly = 0;
+int sysctl_mptcp_print_log __read_mostly = 0;
+int sysctl_mptcp_sndwnd __read_mostly = 0;
+int sysctl_mptcp_cwnd[8] __read_mostly = {0,0,0,0,0,0,0,0};
+int sysctl_mptcp_schedule_ratio[8] __read_mostly = {0,0,0,0,0,0,0,0};
 
 bool mptcp_init_failed __read_mostly;
 
@@ -118,10 +124,52 @@ static struct ctl_table mptcp_table[] = {
 		.proc_handler = &proc_dointvec
 	},
 	{
+		.procname = "mptcp_scheduler",
+		.data = &sysctl_mptcp_scheduler,
+		.maxlen = sizeof(int),
+		.mode = 0644,
+		.proc_handler = &proc_dointvec
+	},
+	{
+		.procname = "mptcp_retx",
+		.data = &sysctl_mptcp_retx,
+		.maxlen = sizeof(int),
+		.mode = 0644,
+		.proc_handler = &proc_dointvec
+	},
+	{
+		.procname = "mptcp_print_log",
+		.data = &sysctl_mptcp_print_log,
+		.maxlen = sizeof(int),
+		.mode = 0644,
+		.proc_handler = &proc_dointvec
+	},
+	{
 		.procname	= "mptcp_path_manager",
 		.mode		= 0644,
 		.maxlen		= MPTCP_PM_NAME_MAX,
 		.proc_handler	= proc_mptcp_path_manager,
+	},
+	{
+		.procname = "mptcp_sndwnd",
+		.data = &sysctl_mptcp_sndwnd,
+		.maxlen	= sizeof(int),
+		.mode = 0644,
+		.proc_handler = &proc_dointvec
+	},
+	{
+		.procname = "mptcp_cwnd",
+		.data = sysctl_mptcp_cwnd,
+		.maxlen	= sizeof(int)*8,
+		.mode = 0644,
+		.proc_handler = &proc_dointvec
+	},
+	{
+		.procname = "mptcp_schedule_ratio",
+		.data = sysctl_mptcp_schedule_ratio,
+		.maxlen	= sizeof(int)*8,
+		.mode = 0644,
+		.proc_handler = &proc_dointvec
 	},
 	{ }
 };
@@ -1107,6 +1155,12 @@ int mptcp_alloc_mpcb(struct sock *meta_sk, __u64 remote_key, u32 window)
 	mpcb->orig_sk_sndbuf = meta_sk->sk_sndbuf;
 	mpcb->orig_window_clamp = meta_tp->window_clamp;
 
+	//Initialize last print out and initial snd_una (added by kaewon)
+	mpcb->last_print_out = 0;
+	mpcb->init_print_out = 0;
+	mpcb->init_snd_una = 0;
+	mpcb->data_ack_needed = 0;
+
 	/* The meta is directly linked - set refcnt to 1 */
 	atomic_set(&mpcb->mpcb_refcnt, 1);
 
@@ -1189,6 +1243,11 @@ int mptcp_add_sock(struct sock *meta_sk, struct sock *sk, u8 loc_id, u8 rem_id,
 	tp->mptcp->loc_id = loc_id;
 	tp->mptcp->rem_id = rem_id;
 	tp->mptcp->last_rbuf_opti = tcp_time_stamp;
+	tp->mptcp->schedule_ratio = 10000000;
+	tp->mptcp->last_data_ack = 0;
+	tp->mptcp->retx_seq = 0;
+	tp->mptcp->alloc_byte = 0;
+	tp->mptcp->unacked_byte = 0;
 
 	/* The corresponding sock_put is in mptcp_sock_destruct(). It cannot be
 	 * included in mptcp_del_sock(), because the mpcb must remain alive

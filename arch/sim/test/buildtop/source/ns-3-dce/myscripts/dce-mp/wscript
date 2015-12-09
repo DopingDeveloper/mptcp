@@ -1,0 +1,15 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+import ns3waf
+import os
+import Options
+
+def configure(conf):
+    ns3waf.check_modules(conf, ['core', 'network', 'dce', 'applications', 'point-to-point', 'mobility', 'visualizer'], mandatory = True)
+
+def build(bld):
+    bld.build_a_script('dce', needed = ['core', 'network', 'dce', 'applications', 'point-to-point', 'mobility', 'visualizer'],
+		   		            target='bin/dce-mp',
+				            source=['dce-mp.cc'],				            
+				            )
+

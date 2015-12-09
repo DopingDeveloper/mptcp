@@ -62,8 +62,8 @@ int main (int argc, char *argv[])
   for (uint32_t i = 0; i < nRtrs; i+=2)
     {
       // Left link
-      pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-      pointToPoint.SetChannelAttribute ("Delay", StringValue ("10ms"));
+      pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("1Mbps"));
+      pointToPoint.SetChannelAttribute ("Delay", StringValue ("1ms"));
       devices1 = pointToPoint.Install (nodes.Get (0), routers.Get (i));
       // Assign ip addresses
       Ipv4InterfaceContainer if1 = address1.Assign (devices1);

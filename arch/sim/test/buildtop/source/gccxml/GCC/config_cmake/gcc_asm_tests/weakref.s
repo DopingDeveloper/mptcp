@@ -1,1 +1,0 @@
-        .weakref foobar, barfnot
